@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learning.payment.mapper.RefundMapper">
+
+    <resultMap id="BaseResultMap" type="com.learning.payment.entity.RefundDO">
+        <id column="refund_id" property="refundId"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="payment_id" property="paymentId"/>
+        <result column="refund_amount" property="refundAmount"/>
+        <result column="status" property="status"/>
+        <result column="refund_reason" property="refundReason"/>
+        <result column="apply_time" property="applyTime"/>
+        <result column="complete_time" property="completeTime"/>
+        <result column="refund_channel" property="refundChannel"/>
+        <result column="refund_transaction_id" property="refundTransactionId"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <insert id="createRefund" parameterType="com.learning.payment.entity.RefundDO" useGeneratedKeys="true" keyProperty="refundId">
+        INSERT INTO t_refund
+        (user_id, order_id, payment_id, refund_amount, refund_reason, refund_channel, remark)
+        VALUES
+        (#{userId}, #{orderId}, #{paymentId}, #{refundAmount}, #{refundReason}, #{refundChannel}, #{remark})
+    </insert>
+
+    <update id="updateRefundStatus">
+        UPDATE t_refund
+        SET status = #{status},
+            complete_time = NOW(),
+            update_time = NOW()
+        WHERE refund_id = #{refundId}
+    </update>
+
+    <select id="selectRefundsByOrderId" resultMap="BaseResultMap">
+        SELECT
+            refund_id, user_id, order_id, payment_id, refund_amount, status,
+            refund_reason, apply_time, complete_time,
+            refund_channel, refund_transaction_id, remark, create_time, update_time, deleted
+        FROM t_refund
+        WHERE order_id = #{orderId}
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

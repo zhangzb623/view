@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: scheduler-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: learning-system
+        group: LEARNING_GROUP
+        service: scheduler-service
+      config:
+        file-extension: yml
+  profiles:
+    active: dev

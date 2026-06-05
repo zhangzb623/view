@@ -1,0 +1,22 @@
+# Nacos 配置文件
+spring:
+  application:
+    name: learning-system
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: learning-system
+        group: LEARNING_GROUP
+        service: ${spring.application.name}
+      config:
+        server-addr: localhost:8848
+        namespace: learning-system
+        group: LEARNING_GROUP
+        file-extension: yml
+        refresh-enabled: true
+
+# 日志配置
+logging:
+  level:
+    com.alibaba.nacos: DEBUG

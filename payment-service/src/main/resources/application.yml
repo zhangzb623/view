@@ -1,0 +1,100 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: payment-service
+  profiles:
+    active: dev
+  shardingsphere:
+    datasource:
+      names: ds
+      ds:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://localhost:3306/learning_system?useUnicode=true&characterEncoding=utf-8&useSSL=false
+        username: root
+        password: root
+    rules:
+      sharding:
+        tables:
+          t_payment:
+            actual-data-nodes: ds.t_payment
+            table-strategy:
+              standard:
+                sharding-column: user_id
+                sharding-algorithm-name: user-id-mod
+            key-generate-strategy:
+              column: payment_id
+              key-generator-name: snowflake
+        sharding-algorithms:
+          user-id-mod:
+            type: io.shardingsphere.sharding.algorithm.impl.ModuloShardingAlgorithm
+            props:
+              algorithm-expression: t_payment_$->{user_id % 4}
+        key-generators:
+          snowflake:
+            type: io.shardingsphere.infra.util.binder.ShardingSphereDefaultKeyGenerator
+            props:
+              worker-id: 2
+    props:
+      sql-show: true
+      check.table.metadata: false
+
+# Seata分布式事务配置
+seata:
+  enabled: true
+  application-id: payment-service
+  tx-service-group: payment-service-group
+  registry:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+      namespace: learning-system
+      group: SEATA_GROUP
+      application: seata-server
+      username: nacos
+      password: nacos
+  config:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+      namespace: learning-system
+      group: SEATA_GROUP
+      username: nacos
+      password: nacos
+      data-id: seata.properties
+
+# Redisson分布式锁配置
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+
+# MyBatis Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.learning.payment.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志配置
+logging:
+  level:
+    com.learning.payment: DEBUG
+    io.seata: DEBUG

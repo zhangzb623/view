@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learning.message.mapper.MessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.learning.message.entity.MessageDO">
+        <id column="message_id" property="messageId"/>
+        <result column="user_id" property="userId"/>
+        <result column="message_type" property="messageType"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="status" property="status"/>
+        <result column="important" property="important"/>
+        <result column="business_id" property="businessId"/>
+        <result column="business_type" property="businessType"/>
+        <result column="source" property="source"/>
+        <result column="notified" property="notified"/>
+        <result column="notify_time" property="notifyTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectByUserIdWithPage" resultMap="BaseResultMap">
+        SELECT
+            message_id, user_id, message_type, title, content, status,
+            important, business_id, business_type, source,
+            notified, notify_time, create_time, update_time, deleted
+        FROM t_message
+        WHERE user_id = #{userId} AND deleted = 0
+        ORDER BY important DESC, create_time DESC
+        LIMIT #{page}, #{size}
+    </select>
+
+    <select id="countUnreadByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM t_message
+        WHERE user_id = #{userId}
+          AND status = 0
+          AND deleted = 0
+    </select>
+
+    <update id="batchMarkAsRead">
+        UPDATE t_message
+        SET status = 1,
+            update_time = NOW()
+        WHERE message_id IN
+        <foreach collection="messageIds" item="messageId" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+    </update>
+
+</mapper>

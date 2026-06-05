@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: message-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: learning-system
+        group: LEARNING_GROUP
+        service: message-service
+      config:
+        file-extension: yml
+  profiles:
+    active: dev

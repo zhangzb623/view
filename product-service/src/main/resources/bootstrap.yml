@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: product-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: learning-system
+        group: LEARNING_GROUP
+        service: product-service
+  profiles:
+    active: dev

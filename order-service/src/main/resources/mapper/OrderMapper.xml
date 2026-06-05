@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learning.order.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.learning.order.entity.OrderDO">
+        <id column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_name" property="productName"/>
+        <result column="quantity" property="quantity"/>
+        <result column="unit_price" property="unitPrice"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="status" property="status"/>
+        <result column="payment_method" property="paymentMethod"/>
+        <result column="payment_status" property="paymentStatus"/>
+        <result column="transaction_id" property="transactionId"/>
+        <result column="remark" property="remark"/>
+        <result column="address" property="address"/>
+        <result column="receiver" property="receiver"/>
+        <result column="receiver_phone" property="receiverPhone"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            o.order_id,
+            o.user_id,
+            o.product_id,
+            o.product_name,
+            o.quantity,
+            o.unit_price,
+            o.total_price,
+            o.status,
+            o.payment_method,
+            o.payment_status,
+            o.transaction_id,
+            o.remark,
+            o.address,
+            o.receiver,
+            o.receiver_phone,
+            o.create_time,
+            o.update_time,
+            o.deleted
+        FROM t_order o
+        WHERE o.deleted = 0
+        <if test="request.userId != null">
+            AND o.user_id = #{request.userId}
+        </if>
+        <if test="request.status != null">
+            AND o.status = #{request.status}
+        </if>
+        <if test="request.username != null and request.username != ''">
+            AND EXISTS (
+                SELECT 1 FROM t_user_info u
+                WHERE u.user_id = o.user_id
+                AND u.username LIKE CONCAT('%', #{request.username}, '%')
+                AND u.deleted = 0
+            )
+        </if>
+        <if test="request.productName != null and request.productName != ''">
+            AND o.product_name LIKE CONCAT('%', #{request.productName}, '%')
+        </if>
+        ORDER BY o.create_time DESC
+    </select>
+
+    <update id="updateStatus">
+        UPDATE t_order
+        SET status = #{status},
+            update_time = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+</mapper>

@@ -1,0 +1,119 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: learning-system
+        group: LEARNING_GROUP
+        service: gateway-service
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          as-path-prefix: true
+      routes:
+        # 认证服务路由
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=2
+
+        # 用户服务路由
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=2
+
+        # 商品服务路由
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=2
+
+        # 订单服务路由
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=2
+
+        # 支付服务路由
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payment/**
+          filters:
+            - StripPrefix=2
+
+        # 消息服务路由
+        - id: message-service
+          uri: lb://message-service
+          predicates:
+            - Path=/api/message/**
+          filters:
+            - StripPrefix=2
+
+        # 调度服务路由
+        - id: scheduler-service
+          uri: lb://scheduler-service
+          predicates:
+            - Path=/api/scheduler/**
+          filters:
+            - StripPrefix=2
+
+        # 管理服务路由
+        - id: admin-service
+          uri: lb://admin-service
+          predicates:
+            - Path=/api/admin/**
+          filters:
+            - StripPrefix=2
+
+        # 健康检查
+        - id: health-check
+          uri: lb://admin-service
+          predicates:
+            - Path=/health
+
+        # 默认路由 (未匹配的路由)
+        - id: default-route
+          uri: lb://admin-service
+          predicates:
+            - Path=/**
+
+  # 环境配置
+  profiles:
+    active: dev
+
+# 日志配置
+logging:
+  level:
+    com.learning: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: payment-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: learning-system
+        group: LEARNING_GROUP
+        service: payment-service
+      config:
+        file-extension: yml
+  profiles:
+    active: dev

@@ -1,0 +1,12 @@
+server:
+  port: 8088
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/learning_admin
+      database: learning_admin
+
+logging:
+  level:
+    com.learning.admin: DEBUG
