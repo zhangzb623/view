@@ -278,7 +278,7 @@ spring-cloud-learning-system/
 │   └── src/main/resources/
 │       ├── application.yml ✅
 │       └── bootstrap.yml ✅
-├── chat-server/                     # 聊天服务器 ⬜
+├── chat-server/                     # 聊天服务器 ✅
 ├── scripts/                         # 脚本文件 ✅
 │   ├── README.md                    # 脚本说明 ✅
 │   └── mysql/                       # MySQL脚本 ✅
@@ -336,7 +336,14 @@ spring-cloud-learning-system/
 
 ### Phase 3: Advanced Features
 - ✅ Admin service (MongoDB logs)
-- ⬜ Chat server (Netty)
+- ✅ Chat server (Netty)
+  - ✅ Netty bootstrap
+  - ✅ packet models
+  - ✅ codec
+  - ✅ session manager
+  - ✅ routing service
+  - ✅ handlers
+  - ✅ README.md
 
 ## Quick Start
 
@@ -728,19 +735,18 @@ curl -X GET http://localhost:8088/api/admin/logs/statistics/overview
 
 ## Documentation
 
-- [Design Specification](docs/superpowers/specs/2026-05-30-spring-cloud-learning-system-design.md)
-- [Implementation Plan](docs/superpowers/specs/2026-06-01-spring-cloud-learning-system-implementation-plan.md)
 - [Database Scripts](scripts/README.md)
+- [Ubuntu Server Deployment Guide](docs/Ubuntu-Deployment.md)
+- [Ubuntu 服务器部署指南（中文版）](docs/Ubuntu-Deployment-CN.md)
+- [Ubuntu 部署简版 Runbook（中文版）](docs/Ubuntu-Deployment-Runbook-CN.md)
+- [Future Features Index](docs/future-features/README.md)
 - [User Service README](user-service/README.md)
 - [Product Service README](product-service/README.md)
 - [Order Service README](order-service/README.md)
 - [Payment Service README](payment-service/README.md)
 - [Message Service README](message-service/README.md)
 - [Admin Service README](admin-service/README.md)
-- [Payment Service README](payment-service/README.md)
-- [Message Service README](message-service/README.md)
-- [Admin Service README](admin-service/README.md)
-- [Order Service README](order-service/README.md)
+- [Chat Server README](chat-server/README.md)
 
 ## Common API Usage
 

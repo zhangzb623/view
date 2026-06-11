@@ -15,7 +15,14 @@ import java.util.concurrent.TimeUnit;
  * Feign客户端基础类
  * 提供通用的Feign客户端创建逻辑
  */
-public abstract class BaseFeignClient {
+public final class BaseFeignClient {
+
+    /**
+     * 创建Feign客户端
+     */
+    public static <T> T createFeignClient(Class<T> apiClass) {
+        return createFeignClient(apiClass, getDefaultUrl(), null, null);
+    }
 
     /**
      * 创建Feign客户端
@@ -35,9 +42,8 @@ public abstract class BaseFeignClient {
      * 创建Feign客户端
      */
     public static <T> T createFeignClient(Class<T> apiClass, String url, Map<String, Object> options,
-                                           Encoder encoder, Decoder decoder) {
+                                          Encoder encoder, Decoder decoder) {
         return Feign.builder()
-                .target(apiClass, url)
                 .encoder(encoder)
                 .decoder(decoder)
                 .logger(new Slf4jLogger(apiClass))
@@ -45,29 +51,16 @@ public abstract class BaseFeignClient {
                 .requestInterceptor(new FeignInterceptor())
                 .retryer(new Retryer.Default(100, 1000, 3))
                 .options(new Request.Options(3, TimeUnit.SECONDS, 5, TimeUnit.SECONDS, true))
-                .build();
-    }
-
-    /**
-     * 创建Feign客户端（使用默认配置）
-     */
-    public static <T> T createFeignClient(Class<T> apiClass) {
-        return createFeignClient(apiClass, getDefaultUrl(), null, null);
-    }
-
-    /**
-     * 创建Feign客户端（使用默认配置和URL）
-     */
-    public static <T> T createFeignClient(Class<T> apiClass, String url) {
-        return createFeignClient(apiClass, url, null, null);
+                .target(apiClass, url);
     }
 
     /**
      * 获取默认URL
      */
-    protected abstract String getDefaultUrl();
+    private static String getDefaultUrl() {
+        return "http://localhost:8080";
+    }
 
     private BaseFeignClient() {
-        throw new UnsupportedOperationException("Base class cannot be instantiated");
     }
 }

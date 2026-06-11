@@ -30,7 +30,6 @@ public class FeignExceptionHandler {
      */
     private void handleRetryableException(RetryableException e) {
         log.warn("Feign调用重试中: {}", e.getMessage(), e);
-        // 可以在这里添加重试逻辑或发送告警
     }
 
     /**
@@ -38,7 +37,6 @@ public class FeignExceptionHandler {
      */
     private void handleRuntimeException(RuntimeException e) {
         log.error("Feign调用失败: {}", e.getMessage(), e);
-        // 可以根据具体的异常类型进行不同的处理
     }
 
     /**
@@ -52,25 +50,13 @@ public class FeignExceptionHandler {
      * 检查是否需要重试
      */
     public boolean shouldRetry(Exception e) {
-        if (e instanceof RetryableException) {
-            return true;
-        }
-        // 可以根据业务规则判断是否需要重试
-        return false;
+        return e instanceof RetryableException;
     }
 
     /**
      * 获取异常重试次数
      */
     public int getRetryCount(Exception e) {
-        if (e instanceof RetryableException) {
-            RetryableException retryableException = (RetryableException) e;
-            return retryableException.retryCount();
-        }
-        return 0;
-    }
-
-    private FeignExceptionHandler() {
-        throw new UnsupportedOperationException("Handler class cannot be instantiated");
+        return e instanceof RetryableException ? 1 : 0;
     }
 }

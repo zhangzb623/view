@@ -7,8 +7,9 @@
 
     <parent>
         <groupId>com.learning</groupId>
-        <artifactId>gateway</artifactId>
+        <artifactId>spring-cloud-learning-system</artifactId>
         <version>1.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>gateway-service</artifactId>

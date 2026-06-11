@@ -9,6 +9,7 @@
         <groupId>com.learning</groupId>
         <artifactId>learning-system-parent</artifactId>
         <version>1.0.0</version>
+        <relativePath>pom-versions.xml</relativePath>
     </parent>
 
     <artifactId>spring-cloud-learning-system</artifactId>
@@ -27,7 +28,6 @@
         <module>order-service</module>
         <module>message-service</module>
         <module>payment-service</module>
-        <module>distribution-service</module>
         <module>scheduler-service</module>
         <module>admin-service</module>
         <module>chat-server</module>
@@ -185,6 +185,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-validation</artifactId>
+                <version>${spring-boot.version}</version>
             </dependency>
 
             <!-- Logging -->

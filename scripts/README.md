@@ -2,6 +2,10 @@
 
 This directory contains database initialization scripts for the Spring Cloud Learning System.
 
+For Ubuntu deployment instructions, see:
+
+- [Ubuntu Server Deployment Guide](../docs/Ubuntu-Deployment.md)
+
 ## Scripts
 
 ### init.sql
