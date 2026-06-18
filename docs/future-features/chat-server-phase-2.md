@@ -108,6 +108,16 @@ Reason to postpone:
 
 Priority: P2
 
+### 10. Test client and scripted verification
+- Provide a reusable TCP test client
+- Support one-click scripted login / heartbeat / private chat / group chat / read-ack / logout flows
+- Include repeatable verification cases for error responses
+
+Reason to postpone:
+- The first iteration should stabilize the server protocol first, while testing can still be done with temporary clients or scripts.
+
+Priority: P1
+
 ## Promotion rule
 
 Move an item into the main Chat Server implementation only when:
