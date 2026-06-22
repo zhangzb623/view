@@ -38,12 +38,12 @@
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <shardingsphere.version>5.4.1</shardingsphere.version>
+        <shardingsphere.version>5.2.1</shardingsphere.version>
         <redisson.version>3.25.0</redisson.version>
-        <kafka.version>3.5.1</kafka.version>
+        <kafka.version>3.2.10</kafka.version>
         <rocketmq.version>2.2.3</rocketmq.version>
         <seata.version>1.7.1</seata.version>
-        <xxl-job.version>2.4.0</xxl-job.version>
+        <xxl-job.version>2.5.0</xxl-job.version>
         <netty.version>4.1.100.Final</netty.version>
         <jwt.version>0.11.5</jwt.version>
         <fastjson2.version>2.0.40</fastjson2.version>
@@ -123,7 +123,7 @@
 
             <!-- xxl-job -->
             <dependency>
-                <groupId>com.xuxueli</groupId>
+                <groupId>io.github.wangrui027</groupId>
                 <artifactId>xxl-job-spring-boot-starter</artifactId>
                 <version>${xxl-job.version}</version>
             </dependency>

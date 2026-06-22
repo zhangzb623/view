@@ -3,6 +3,9 @@ package com.learning.product.service;
 import com.learning.common.api.result.PageResult;
 import com.learning.product.dto.*;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 商品服务接口
  */

@@ -2,6 +2,9 @@ package com.learning.user.service;
 
 import com.learning.common.api.result.PageResult;
 import com.learning.user.dto.*;
+import com.learning.user.entity.UserAddressDO;
+
+import java.math.BigDecimal;
 
 /**
  * 用户服务接口

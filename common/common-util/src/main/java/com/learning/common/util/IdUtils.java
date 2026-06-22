@@ -69,13 +69,6 @@ public class IdUtils {
         return generateSnowflakeId();
     }
 
-    /**
-     * 生成消息ID
-     */
-    public static String generateMessageId() {
-        return "MSG" + System.currentTimeMillis() + String.format("%04d", ThreadLocalRandom.current().nextInt(10000));
-    }
-
     private IdUtils() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }

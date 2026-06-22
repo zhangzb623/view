@@ -78,7 +78,7 @@ public class UserController {
             @Valid @RequestBody UpdateUserRequest request) {
         try {
             userService.updateUser(userId, request);
-            return Result.success("更新成功");
+            return Result.success("更新成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class UserController {
             @Parameter(description = "用户ID") @PathVariable Long userId) {
         try {
             userService.deleteUser(userId);
-            return Result.success("删除成功");
+            return Result.success("删除成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -154,7 +154,7 @@ public class UserController {
             @Valid @RequestBody UserAddressDO address) {
         try {
             userService.updateUserAddress(addressId, address);
-            return Result.success("更新成功");
+            return Result.success("更新成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -169,7 +169,7 @@ public class UserController {
             @Parameter(description = "地址ID") @PathVariable Long addressId) {
         try {
             userService.deleteUserAddress(addressId);
-            return Result.success("删除成功");
+            return Result.success("删除成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -185,7 +185,7 @@ public class UserController {
             @Parameter(description = "地址ID") @PathVariable Long addressId) {
         try {
             userService.setDefaultAddress(userId, addressId);
-            return Result.success("设置成功");
+            return Result.success("设置成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -201,7 +201,7 @@ public class UserController {
             @Parameter(description = "扣减金额") @RequestParam BigDecimal amount) {
         try {
             userService.deductBalance(userId, amount);
-            return Result.success("扣减成功");
+            return Result.success("扣减成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -217,7 +217,7 @@ public class UserController {
             @Parameter(description = "增加金额") @RequestParam BigDecimal amount) {
         try {
             userService.addBalance(userId, amount);
-            return Result.success("增加成功");
+            return Result.success("增加成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {

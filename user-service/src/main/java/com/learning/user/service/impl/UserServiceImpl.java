@@ -1,6 +1,7 @@
 package com.learning.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learning.common.api.result.PageResult;
 import com.learning.common.starter.exception.BusinessException;
 import com.learning.common.starter.utils.CacheHelper;
@@ -186,17 +187,14 @@ public class UserServiceImpl implements UserService {
         wrapper.eq(UserDO::getDeleted, 0)
                .orderByDesc(UserDO::getCreateTime);
 
-        PageResult<UserDO> pageResult = userMapper.selectPage(current, size, wrapper);
+        Page<UserDO> page = new Page<>(current, size);
+        Page<UserDO> pageData = userMapper.selectPage(page, wrapper);
 
-        PageResult<UserInfoVO> result = new PageResult<>();
-        result.setCurrent(pageResult.getCurrent());
-        result.setSize(pageResult.getSize());
-        result.setTotal(pageResult.getTotal());
-        result.setRecords(pageResult.getRecords().stream()
+        List<UserInfoVO> records = pageData.getRecords().stream()
                 .map(this::convertToUserInfoVO)
-                .toList());
+                .toList();
 
-        return result;
+        return PageResult.of(records, pageData.getTotal(), pageData.getCurrent(), pageData.getSize());
     }
 
     @Override
@@ -218,10 +216,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageResult<UserAddressDO> getUserAddressList(Long userId, Integer current, Integer size) {
-        PageResult<UserAddressDO> pageResult = userAddressMapper.selectPage(current, size,
-                "SELECT * FROM t_user_address WHERE user_id = " + userId + " AND status = 1 ORDER BY is_default DESC, create_time DESC");
+        LambdaQueryWrapper<UserAddressDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserAddressDO::getUserId, userId)
+               .eq(UserAddressDO::getStatus, 1)
+               .orderByDesc(UserAddressDO::getIsDefault)
+               .orderByDesc(UserAddressDO::getCreateTime);
 
-        return pageResult;
+        Page<UserAddressDO> page = new Page<>(current, size);
+        Page<UserAddressDO> pageData = userAddressMapper.selectPage(page, wrapper);
+
+        return PageResult.of(pageData.getRecords(), pageData.getTotal(), pageData.getCurrent(), pageData.getSize());
     }
 
     @Override

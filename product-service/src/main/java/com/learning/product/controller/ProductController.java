@@ -50,7 +50,7 @@ public class ProductController {
             @Valid @RequestBody UpdateProductRequest request) {
         try {
             productService.updateProduct(productId, request);
-            return Result.success("更新成功");
+            return Result.success("更新成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class ProductController {
             @Parameter(description = "商品ID") @PathVariable Long productId) {
         try {
             productService.deleteProduct(productId);
-            return Result.success("删除成功");
+            return Result.success("删除成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class ProductController {
             @Parameter(description = "商品ID") @PathVariable Long productId) {
         try {
             productService.offlineProduct(productId);
-            return Result.success("下架成功");
+            return Result.success("下架成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -154,7 +154,7 @@ public class ProductController {
             @Parameter(description = "商品ID") @PathVariable Long productId) {
         try {
             productService.onlineProduct(productId);
-            return Result.success("上架成功");
+            return Result.success("上架成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -183,7 +183,7 @@ public class ProductController {
             @Parameter(description = "扣减数量") @RequestParam Integer quantity) {
         try {
             productService.deductStock(productId, quantity);
-            return Result.success("扣减成功");
+            return Result.success("扣减成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -199,7 +199,7 @@ public class ProductController {
             @Parameter(description = "增加数量") @RequestParam Integer quantity) {
         try {
             productService.addStock(productId, quantity);
-            return Result.success("增加成功");
+            return Result.success("增加成功", null);
         } catch (Exception e) {
             log.error("增加库存失败", e);
             return Result.fail("增加失败");
@@ -226,7 +226,7 @@ public class ProductController {
             @RequestBody Map<Long, Integer> productIdToQuantity) {
         try {
             productService.batchDeductStock(productIdToQuantity);
-            return Result.success("扣减成功");
+            return Result.success("扣减成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {

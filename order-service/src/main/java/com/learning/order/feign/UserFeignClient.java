@@ -3,7 +3,9 @@ package com.learning.order.feign;
 import com.learning.common.api.result.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 用户服务Feign客户端
@@ -26,20 +28,20 @@ public interface UserFeignClient {
     /**
      * 扣减用户余额
      */
-    @GetMapping("/api/user/balance/deduct?userId={userId}&amount={amount}")
+    @GetMapping("/api/user/balance/deduct")
     Result<Void> deductBalance(
-        @PathVariable("userId") Long userId,
-        @PathVariable("amount") java.math.BigDecimal amount,
+        @RequestParam("userId") Long userId,
+        @RequestParam("amount") java.math.BigDecimal amount,
         @RequestHeader("Authorization") String token
     );
 
     /**
      * 增加用户余额（退款用）
      */
-    @GetMapping("/api/user/balance/add?userId={userId}&amount={amount}")
+    @GetMapping("/api/user/balance/add")
     Result<Void> addBalance(
-        @PathVariable("userId") Long userId,
-        @PathVariable("amount") java.math.BigDecimal amount,
+        @RequestParam("userId") Long userId,
+        @RequestParam("amount") java.math.BigDecimal amount,
         @RequestHeader("Authorization") String token
     );
 

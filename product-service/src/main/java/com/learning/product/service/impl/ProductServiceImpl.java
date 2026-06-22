@@ -1,6 +1,7 @@
 package com.learning.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learning.common.api.result.PageResult;
 import com.learning.common.starter.exception.BusinessException;
 import com.learning.common.starter.utils.CacheHelper;
@@ -14,11 +15,6 @@ import com.learning.product.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,9 +41,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private LockHelper lockHelper;
-
-    @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Override
     @Transactional
@@ -122,9 +115,6 @@ public class ProductServiceImpl implements ProductService {
         cacheHelper.delete("product:" + productId);
         clearCategoryCache();
 
-        // 更新Elasticsearch
-        updateElasticsearch(product);
-
         log.info("商品更新成功: productId={}", productId);
     }
 
@@ -167,49 +157,47 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public PageResult<ProductDTO> getProductByCategoryId(Long categoryId, Integer current, Integer size) {
-        // 使用MyBatis Plus分页
-        PageResult<ProductDO> pageResult = productMapper.selectPage(current, size,
-                "SELECT * FROM t_product WHERE category_id = " + categoryId + " AND status = 1 AND deleted = 0 ORDER BY sales_count DESC, create_time DESC");
+        LambdaQueryWrapper<ProductDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ProductDO::getCategoryId, categoryId)
+               .eq(ProductDO::getStatus, 1)
+               .eq(ProductDO::getDeleted, 0)
+               .orderByDesc(ProductDO::getSalesCount)
+               .orderByDesc(ProductDO::getCreateTime);
 
-        PageResult<ProductDTO> result = new PageResult<>();
-        result.setCurrent(pageResult.getCurrent());
-        result.setSize(pageResult.getSize());
-        result.setTotal(pageResult.getTotal());
-        result.setRecords(pageResult.getRecords().stream()
+        Page<ProductDO> page = new Page<>(current, size);
+        Page<ProductDO> pageData = productMapper.selectPage(page, wrapper);
+
+        List<ProductDTO> records = pageData.getRecords().stream()
                 .map(this::convertToProductDTO)
-                .toList());
+                .toList();
 
-        return result;
+        return PageResult.of(records, pageData.getTotal(), pageData.getCurrent(), pageData.getSize());
     }
 
     @Override
     public PageResult<ProductDTO> searchProducts(String keyword, Integer current, Integer size) {
-        // 使用Elasticsearch搜索
-        NativeSearchQuery query = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.multiMatchQuery(keyword, "productName", "productDesc"))
-                .withFilter(QueryBuilders.termQuery("status", 1))
-                .withFilter(QueryBuilders.termQuery("deleted", 0))
-                .withPageable(PageRequest.of(current - 1, size))
-                .build();
+        // 使用数据库模糊匹配搜索（一期不依赖 Elasticsearch）
+        LambdaQueryWrapper<ProductDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ProductDO::getStatus, 1)
+               .eq(ProductDO::getDeleted, 0);
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(ProductDO::getProductName, keyword)
+                              .or().like(ProductDO::getProductDesc, keyword));
+        }
+        wrapper.orderByDesc(ProductDO::getSalesCount)
+               .orderByDesc(ProductDO::getCreateTime);
 
-        SearchHits<ProductDO> searchHits = elasticsearchTemplate.search(query, ProductDO.class);
+        Page<ProductDO> page = new Page<>(current, size);
+        Page<ProductDO> pageData = productMapper.selectPage(page, wrapper);
 
-        PageResult<ProductDTO> result = new PageResult<>();
-        result.setCurrent(current);
-        result.setSize(size);
-        result.setTotal(searchHits.getTotalHits());
-        result.setRecords(searchHits.get().map(SearchHit::getContent)
+        List<ProductDTO> records = pageData.getRecords().stream()
                 .map(this::convertToProductDTO)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
 
         // 更新缓存
-        searchHits.forEach(hit -> {
-            ProductDO product = hit.getContent();
-            ProductDTO dto = convertToProductDTO(product);
-            cacheHelper.set("product:" + product.getProductId(), dto, 3600L, TimeUnit.SECONDS);
-        });
+        records.forEach(dto -> cacheHelper.set("product:" + dto.getProductId(), dto, 3600L, TimeUnit.SECONDS));
 
-        return result;
+        return PageResult.of(records, pageData.getTotal(), pageData.getCurrent(), pageData.getSize());
     }
 
     @Override
@@ -218,17 +206,14 @@ public class ProductServiceImpl implements ProductService {
         wrapper.eq(ProductDO::getDeleted, 0)
                .orderByDesc(ProductDO::getCreateTime);
 
-        PageResult<ProductDO> pageResult = productMapper.selectPage(current, size, wrapper);
+        Page<ProductDO> page = new Page<>(current, size);
+        Page<ProductDO> pageData = productMapper.selectPage(page, wrapper);
 
-        PageResult<ProductDTO> result = new PageResult<>();
-        result.setCurrent(pageResult.getCurrent());
-        result.setSize(pageResult.getSize());
-        result.setTotal(pageResult.getTotal());
-        result.setRecords(pageResult.getRecords().stream()
+        List<ProductDTO> records = pageData.getRecords().stream()
                 .map(this::convertToProductDTO)
-                .toList());
+                .toList();
 
-        return result;
+        return PageResult.of(records, pageData.getTotal(), pageData.getCurrent(), pageData.getSize());
     }
 
     @Override
@@ -296,7 +281,6 @@ public class ProductServiceImpl implements ProductService {
         // 清除缓存
         cacheHelper.delete("product:" + productId);
         clearCategoryCache();
-        updateElasticsearch(product);
 
         log.info("商品下架成功: productId={}", productId);
     }
@@ -315,7 +299,6 @@ public class ProductServiceImpl implements ProductService {
         // 清除缓存
         cacheHelper.delete("product:" + productId);
         clearCategoryCache();
-        updateElasticsearch(product);
 
         log.info("商品上架成功: productId={}", productId);
     }
@@ -335,7 +318,9 @@ public class ProductServiceImpl implements ProductService {
                 throw new BusinessException("商品库存不足");
             }
 
-            productMapper.updateById(productId, stock - quantity);
+            ProductDO product = productMapper.selectById(productId);
+            product.setStock(stock - quantity);
+            productMapper.updateById(product);
 
             // 更新缓存
             ProductDTO dto = getProductById(productId);
@@ -385,7 +370,9 @@ public class ProductServiceImpl implements ProductService {
                     throw new BusinessException("商品[" + productId + "]库存不足");
                 }
 
-                productMapper.updateById(productId, stock - quantity);
+                ProductDO product = productMapper.selectById(productId);
+                product.setStock(stock - quantity);
+                productMapper.updateById(product);
 
                 // 更新缓存
                 ProductDTO dto = getProductById(productId);
@@ -398,21 +385,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductCountDTO> getProductCountDistribution(Integer limit) {
-        return categoryMapper.countProductsByCategory(limit);
-    }
-
-    /**
-     * 更新Elasticsearch文档
-     */
-    private void updateElasticsearch(ProductDO product) {
-        try {
-            ProductDO productDO = productMapper.selectById(product.getProductId());
-            if (productDO != null) {
-                elasticsearchTemplate.save(productDO);
-            }
-        } catch (Exception e) {
-            log.error("更新Elasticsearch失败", e);
-        }
+        return categoryMapper.countProductsByCategory(limit).stream()
+                .map(item -> {
+                    ProductCountDTO dto = new ProductCountDTO();
+                    Object categoryId = item.get("category_id");
+                    Object count = item.get("count");
+                    if (categoryId instanceof Number number) {
+                        dto.setCategoryId(number.longValue());
+                    }
+                    if (count instanceof Number number) {
+                        dto.setCount(number.intValue());
+                    }
+                    return dto;
+                })
+                .toList();
     }
 
     /**

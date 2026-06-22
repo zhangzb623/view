@@ -45,6 +45,12 @@ public class CacheHelper {
         return (T) operations.get(key);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T get(String key, Class<T> type) {
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+        return (T) operations.get(key);
+    }
+
     public Boolean delete(String key) {
         return redisTemplate.delete(key);
     }

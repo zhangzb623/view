@@ -2,6 +2,7 @@ package com.learning.user.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +26,7 @@ public class JwtUtils {
     /**
      * 算法
      */
-    private static final String ALGORITHM = "HS256";
+    private static final SignatureAlgorithm ALGORITHM = SignatureAlgorithm.HS256;
 
     /**
      * 生成Token
@@ -36,9 +37,9 @@ public class JwtUtils {
         claims.put("username", username);
 
         return Jwts.builder()
-                .claims(claims)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 7200000)) // 2小时
+                .setClaims(claims)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 7200000)) // 2小时
                 .signWith(getSecretKey(), ALGORITHM)
                 .compact();
     }
@@ -48,11 +49,11 @@ public class JwtUtils {
      */
     public static Claims parseToken(String token) {
         try {
-            return Jwts.parser()
-                    .verifyWith(getSecretKey())
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSecretKey())
                     .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (Exception e) {
             log.error("解析Token失败", e);
             return null;
