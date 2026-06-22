@@ -1,0 +1,43 @@
+target/
+logs/
+.mvn/
+mvnw
+mvnw.cmd
+!**/src/main/**
+!**/src/test/**
+
+.scannerwork/
+
+src/main/resources/docs/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### VS Code ###
+.vscode/
+
+### remix ###
+artifacts/
+.deps/
+
+.DS_Store
