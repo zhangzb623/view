@@ -184,22 +184,26 @@ if __name__ == "__main__":
 
 ## 4. 怎么运行
 
+仓库中已经提供现成脚本：
+
+- `chat-server/scripts/chat_test_client.py`
+
 先启动服务端：
 
 ```bash
 mvn -pl chat-server spring-boot:run
 ```
 
-再运行脚本：
+再在项目根目录执行：
 
 ```bash
-python chat_test_client.py
+python chat-server/scripts/chat_test_client.py
 ```
 
 如果你电脑上是 Python 3，也可能需要：
 
 ```bash
-python3 chat_test_client.py
+python3 chat-server/scripts/chat_test_client.py
 ```
 
 ## 5. 运行后你应该看到什么
