@@ -23,7 +23,7 @@ public class OrderRocketMQProducer {
      */
     public void sendOrderCancelDelayMessage(Long orderId, Long userId) {
         Message<OrderEvent> message = MessageBuilder
-            .withPayload(new OrderEvent(orderId, userId, "CANCELLED", null))
+            .withPayload(new OrderEvent(orderId, userId, "CANCELLED", null, null, null, null, null, null))
             .setHeader("DELAY_TIME_LEVEL", 4)
             .build();
 
@@ -37,7 +37,7 @@ public class OrderRocketMQProducer {
      */
     public void sendOrderPaymentSuccess(Long orderId, Long userId) {
         Message<OrderEvent> message = MessageBuilder
-            .withPayload(new OrderEvent(orderId, userId, "PAYMENT_SUCCESS", null))
+            .withPayload(new OrderEvent(orderId, userId, "PAYMENT_SUCCESS", null, null, null, null, null, null))
             .build();
 
         rocketMQTemplate.syncSend("order-payment-topic", message);
@@ -50,7 +50,7 @@ public class OrderRocketMQProducer {
      */
     public void sendOrderShipped(Long orderId, Long userId) {
         Message<OrderEvent> message = MessageBuilder
-            .withPayload(new OrderEvent(orderId, userId, "SHIPPED", null))
+            .withPayload(new OrderEvent(orderId, userId, "SHIPPED", null, null, null, null, null, null))
             .build();
 
         rocketMQTemplate.syncSend("order-ship-topic", message);

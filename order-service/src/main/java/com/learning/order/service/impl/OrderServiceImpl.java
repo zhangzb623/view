@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learning.common.api.result.PageResult;
+import com.learning.common.api.result.Result;
 import com.learning.common.starter.exception.BusinessException;
 import com.learning.common.starter.utils.LockHelper;
 import com.learning.order.dto.CancelOrderRequest;
@@ -221,8 +222,13 @@ public class OrderServiceImpl implements OrderService {
             userId = request.getUserId();
         }
 
-        IPage<OrderDO> orderPage = orderMapper.selectPageByCondition(page,
-            new OrderQueryRequest(userId, request.getStatus(), null, null, request.getPage(), request.getSize()));
+        OrderQueryRequest queryRequest = new OrderQueryRequest();
+        queryRequest.setUserId(userId);
+        queryRequest.setStatus(request.getStatus());
+        queryRequest.setPage(request.getPage());
+        queryRequest.setSize(request.getSize());
+
+        IPage<OrderDO> orderPage = orderMapper.selectPageByCondition(page, queryRequest);
 
         PageResult<OrderDTO> result = new PageResult<>();
         result.setCurrent(orderPage.getCurrent());

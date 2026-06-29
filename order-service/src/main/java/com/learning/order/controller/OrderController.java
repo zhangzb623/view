@@ -51,7 +51,7 @@ public class OrderController {
             @Parameter(description = "支付方式") @RequestParam Integer paymentMethod) {
         try {
             orderService.payOrder(orderId, transactionId, paymentMethod);
-            return Result.success("支付成功");
+            return Result.success("支付成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class OrderController {
     public Result<Void> cancelOrder(@Valid @RequestBody CancelOrderRequest request) {
         try {
             orderService.cancelOrder(request);
-            return Result.success("取消成功");
+            return Result.success("取消成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class OrderController {
             @Parameter(description = "订单状态") @RequestParam Integer status) {
         try {
             orderService.updateOrderStatus(orderId, status);
-            return Result.success("状态更新成功");
+            return Result.success("状态更新成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -123,7 +123,7 @@ public class OrderController {
             @Parameter(description = "物流单号") @RequestParam String trackingNumber) {
         try {
             orderService.shipOrder(orderId, trackingNumber);
-            return Result.success("发货成功");
+            return Result.success("发货成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class OrderController {
     public Result<Void> completeOrder(@Parameter(description = "订单ID") @PathVariable Long orderId) {
         try {
             orderService.completeOrder(orderId);
-            return Result.success("订单完成");
+            return Result.success("订单完成", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {

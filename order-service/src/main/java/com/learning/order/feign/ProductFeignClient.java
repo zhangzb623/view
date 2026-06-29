@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 
@@ -30,10 +31,20 @@ public interface ProductFeignClient {
     /**
      * 扣减商品库存
      */
-    @GetMapping("/api/product/{productId}/stock/deduct?quantity={quantity}")
+    @GetMapping("/api/product/{productId}/stock/deduct")
     Result<Void> deductStock(
         @PathVariable("productId") Long productId,
-        @PathVariable("quantity") Integer quantity,
+        @RequestParam("quantity") Integer quantity,
+        @RequestHeader("Authorization") String token
+    );
+
+    /**
+     * 增加商品库存
+     */
+    @GetMapping("/api/product/{productId}/stock/add")
+    Result<Void> addStock(
+        @PathVariable("productId") Long productId,
+        @RequestParam("quantity") Integer quantity,
         @RequestHeader("Authorization") String token
     );
 
