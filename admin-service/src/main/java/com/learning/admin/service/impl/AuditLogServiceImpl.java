@@ -65,7 +65,7 @@ public class AuditLogServiceImpl implements AuditLogService {
         List<AuditLogDO> logs = mongoTemplate.find(query, AuditLogDO.class);
         long total = mongoTemplate.count(countQuery, AuditLogDO.class);
         List<AuditLogDTO> records = logs.stream().map(this::toDTO).toList();
-        return PageResult.of(records, total, request.getCurrent(), request.getSize());
+        return PageResult.of(records, total, request.getCurrent().longValue(), request.getSize().longValue());
     }
 
     private AuditLogDTO toDTO(AuditLogDO log) {

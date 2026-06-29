@@ -1,13 +1,8 @@
 package com.learning.scheduler.handler;
 
-import com.xuxueli.xxjob.core.context.XxlJobHelper;
-import com.xuxueli.xxjob.core.executor.impl.XxlJobSpringExecutor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -50,12 +45,12 @@ public class MailNotificationTaskHandler {
             }
 
             String result = String.format("邮件发送完成，成功 %d 封，失败 %d 封", successCount, failCount);
-            XxlJobHelper.handleSuccess(result);
+            handleSuccess(result);
             log.info(result);
 
         } catch (Exception e) {
             log.error("邮件发送任务失败", e);
-            XxlJobHelper.handleFail("邮件发送任务失败: " + e.getMessage());
+            handleFail("邮件发送任务失败: " + e.getMessage());
         }
     }
 
@@ -83,8 +78,14 @@ public class MailNotificationTaskHandler {
      * 模拟发送邮件
      */
     private void sendEmail(String email, String name) {
-        log.info("模拟发送邮件: To={}, Name={}, Subject: 日常数据报告",
-            email, name);
-        // TODO: 实际发送邮件逻辑
+        log.info("模拟发送邮件: To={}, Name={}, Subject: 日常数据报告", email, name);
+    }
+
+    private void handleSuccess(String message) {
+        log.info("任务执行成功: {}", message);
+    }
+
+    private void handleFail(String message) {
+        log.error("任务执行失败: {}", message);
     }
 }

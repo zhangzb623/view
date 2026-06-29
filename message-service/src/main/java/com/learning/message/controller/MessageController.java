@@ -88,7 +88,7 @@ public class MessageController {
             MarkAsReadRequest request = new MarkAsReadRequest();
             request.setMessageId(messageId);
             messageService.markAsRead(request);
-            return Result.success("标记成功");
+            return Result.success("标记成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -103,7 +103,7 @@ public class MessageController {
             @Parameter(description = "用户ID") @PathVariable Long userId) {
         try {
             messageService.markAllAsRead(userId);
-            return Result.success("标记成功");
+            return Result.success("标记成功", null);
         } catch (Exception e) {
             log.error("标记所有消息失败", e);
             return Result.fail("标记失败");
@@ -116,7 +116,7 @@ public class MessageController {
             @Parameter(description = "消息ID") @PathVariable Long messageId) {
         try {
             messageService.deleteMessage(messageId);
-            return Result.success("删除成功");
+            return Result.success("删除成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {

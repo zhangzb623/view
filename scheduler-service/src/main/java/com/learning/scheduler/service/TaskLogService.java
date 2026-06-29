@@ -4,6 +4,7 @@ import com.learning.scheduler.dto.TaskLogDTO;
 import com.learning.scheduler.dto.TaskQueryRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务日志服务接口

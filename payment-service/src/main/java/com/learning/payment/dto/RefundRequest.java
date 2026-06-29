@@ -3,6 +3,8 @@ package com.learning.payment.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 退款请求
  */
@@ -25,4 +27,9 @@ public class RefundRequest {
      * 退款金额（可选，默认全额退款）
      */
     private BigDecimal refundAmount;
+
+    /**
+     * 退款渠道
+     */
+    private String refundChannel;
 }

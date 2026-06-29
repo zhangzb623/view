@@ -4,6 +4,7 @@ import com.learning.common.api.result.Result;
 import com.learning.common.starter.exception.BusinessException;
 import com.learning.payment.dto.CreatePaymentRequest;
 import com.learning.payment.dto.PaymentDTO;
+import com.learning.payment.dto.RefundDTO;
 import com.learning.payment.dto.RefundRequest;
 import com.learning.payment.service.PaymentService;
 import com.learning.payment.service.RefundService;
@@ -50,7 +51,7 @@ public class PaymentController {
             @Parameter(description = "支付ID") @PathVariable Long paymentId) {
         try {
             paymentService.callThirdPartyPayment(paymentId);
-            return Result.success("第三方支付调用成功");
+            return Result.success("第三方支付调用成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {
@@ -136,7 +137,7 @@ public class PaymentController {
             @Parameter(description = "退款ID") @PathVariable Long refundId) {
         try {
             refundService.callThirdPartyRefund(refundId);
-            return Result.success("第三方退款调用成功");
+            return Result.success("第三方退款调用成功", null);
         } catch (BusinessException e) {
             return Result.fail(e.getCode(), e.getMessage());
         } catch (Exception e) {

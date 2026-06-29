@@ -65,7 +65,7 @@ public class OperationLogServiceImpl implements OperationLogService {
         List<OperationLogDO> logs = mongoTemplate.find(query, OperationLogDO.class);
         long total = mongoTemplate.count(countQuery, OperationLogDO.class);
         List<OperationLogDTO> records = logs.stream().map(this::toDTO).toList();
-        return PageResult.of(records, total, request.getCurrent(), request.getSize());
+        return PageResult.of(records, total, request.getCurrent().longValue(), request.getSize().longValue());
     }
 
     private OperationLogDTO toDTO(OperationLogDO log) {

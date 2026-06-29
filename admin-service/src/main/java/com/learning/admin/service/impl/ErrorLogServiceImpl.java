@@ -62,7 +62,7 @@ public class ErrorLogServiceImpl implements ErrorLogService {
         List<ErrorLogDO> logs = mongoTemplate.find(query, ErrorLogDO.class);
         long total = mongoTemplate.count(countQuery, ErrorLogDO.class);
         List<ErrorLogDTO> records = logs.stream().map(this::toDTO).toList();
-        return PageResult.of(records, total, request.getCurrent(), request.getSize());
+        return PageResult.of(records, total, request.getCurrent().longValue(), request.getSize().longValue());
     }
 
     private ErrorLogDTO toDTO(ErrorLogDO log) {

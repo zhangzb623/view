@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -98,10 +100,9 @@ public class TaskLogServiceImpl implements TaskLogService {
         }
 
         // 排序
-        query.with(PageRequest.of(request.getPage() - 1, request.getSize()))
-              .orderBy(org.springframework.data.domain.Sort.by(
-                  org.springframework.data.domain.Sort.Direction.DESC, "createTime")
-              );
+        query.with(PageRequest.of(request.getPage() - 1, request.getSize()));
+        query.with(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "createTime"));
 
         List<TaskLogDO> taskLogs = mongoTemplate.find(query, TaskLogDO.class);
 

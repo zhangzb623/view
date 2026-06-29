@@ -1,9 +1,6 @@
 package com.learning.scheduler.handler;
 
-import com.xuxueli.xxjob.core.context.XxlJobHelper;
-import com.xuxueli.xxjob.core.executor.impl.XxlJobSpringExecutor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -23,8 +20,8 @@ public class TestTaskHandler {
      */
     public void testJob() {
         // 获取任务参数
-        String jobParam = XxlJobHelper.getJobParam();
-        log.info("任务执行: jobId={}, jobParam={}", XxlJobHelper.getJobId(), jobParam);
+        String jobParam = getJobParam();
+        log.info("任务执行: jobId={}, jobParam={}", getJobId(), jobParam);
 
         try {
             // 模拟任务执行
@@ -40,14 +37,14 @@ public class TestTaskHandler {
             result.put("message", "任务执行成功");
 
             // 返回执行结果
-            XxlJobHelper.handleSuccess(result.toString());
+            handleSuccess(result.toString());
 
             log.info("任务执行完成: {}", result);
 
         } catch (Exception e) {
             log.error("任务执行失败", e);
             // 返回执行失败
-            XxlJobHelper.handleFail("任务执行失败: " + e.getMessage());
+            handleFail("任务执行失败: " + e.getMessage());
         }
     }
 
@@ -65,12 +62,12 @@ public class TestTaskHandler {
             result.put("paymentCount", 8750);
             result.put("statisticsTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-            XxlJobHelper.handleSuccess(result.toString());
+            handleSuccess(result.toString());
             log.info("数据统计完成: {}", result);
 
         } catch (Exception e) {
             log.error("数据统计失败", e);
-            XxlJobHelper.handleFail("数据统计失败: " + e.getMessage());
+            handleFail("数据统计失败: " + e.getMessage());
         }
     }
 
@@ -87,12 +84,12 @@ public class TestTaskHandler {
             // 更新超时订单状态
             log.info("更新超时订单状态...");
 
-            XxlJobHelper.handleSuccess("订单超时检查完成，共处理 " + 15 + " 条超时订单");
+            handleSuccess("订单超时检查完成，共处理 " + 15 + " 条超时订单");
             log.info("订单超时检查完成");
 
         } catch (Exception e) {
             log.error("订单超时检查失败", e);
-            XxlJobHelper.handleFail("订单超时检查失败: " + e.getMessage());
+            handleFail("订单超时检查失败: " + e.getMessage());
         }
     }
 
@@ -106,12 +103,12 @@ public class TestTaskHandler {
             // 清理过期缓存（模拟）
             int cleanedCount = 120;
 
-            XxlJobHelper.handleSuccess("缓存清理完成，共清理 " + cleanedCount + " 条缓存数据");
+            handleSuccess("缓存清理完成，共清理 " + cleanedCount + " 条缓存数据");
             log.info("缓存清理完成，共清理 {} 条缓存数据", cleanedCount);
 
         } catch (Exception e) {
             log.error("缓存清理失败", e);
-            XxlJobHelper.handleFail("缓存清理失败: " + e.getMessage());
+            handleFail("缓存清理失败: " + e.getMessage());
         }
     }
 
@@ -129,12 +126,28 @@ public class TestTaskHandler {
             reportData.put("orders", 892);
             reportData.put("users", 125);
 
-            XxlJobHelper.handleSuccess(reportData.toString());
+            handleSuccess(reportData.toString());
             log.info("报表生成完成: {}", reportData);
 
         } catch (Exception e) {
             log.error("报表生成失败", e);
-            XxlJobHelper.handleFail("报表生成失败: " + e.getMessage());
+            handleFail("报表生成失败: " + e.getMessage());
         }
+    }
+
+    private String getJobParam() {
+        return "";
+    }
+
+    private String getJobId() {
+        return "local-job";
+    }
+
+    private void handleSuccess(String message) {
+        log.info("任务执行成功: {}", message);
+    }
+
+    private void handleFail(String message) {
+        log.error("任务执行失败: {}", message);
     }
 }

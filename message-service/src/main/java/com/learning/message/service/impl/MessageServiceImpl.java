@@ -83,9 +83,9 @@ public class MessageServiceImpl implements MessageService {
                 .collect(Collectors.toList());
 
         // 获取总数量
-        int total = (int) messageMapper.selectCount(new LambdaQueryWrapper<MessageDO>()
+        int total = messageMapper.selectCount(new LambdaQueryWrapper<MessageDO>()
                 .eq(MessageDO::getUserId, request.getUserId())
-                .eq(MessageDO::getDeleted, 0));
+                .eq(MessageDO::getDeleted, 0)).intValue();
 
         Map<String, Object> result = new HashMap<>();
         result.put("records", messageDTOs);

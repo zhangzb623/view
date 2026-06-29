@@ -42,9 +42,4 @@ public interface TaskLogRepository extends MongoRepository<TaskLogDO, String> {
      * 统计成功次数
      */
     long countByJobNameAndStatusAndDeleted(String jobName, Integer status, Integer deleted);
-
-    /**
-     * 统计失败次数
-     */
-    long countByJobNameAndStatusAndDeleted(String jobName, Integer status, Integer deleted);
 }
