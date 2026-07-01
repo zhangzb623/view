@@ -85,13 +85,51 @@ vim --version | head -n 1
 ```
 
 ### 安装 Docker
+WSL2 环境推荐优先使用 Docker Desktop：
+
+1. Windows 安装 Docker Desktop
+2. Docker Desktop 设置中启用 `Use the WSL 2 based engine`
+3. 在 `Resources -> WSL integration` 中启用当前 Ubuntu 发行版
+4. 回到 Ubuntu 执行验证命令
+
+如果希望完全在 Ubuntu 内安装 Docker Engine，请使用 Docker 官方 apt 源。Ubuntu 24.04 默认源里的 `docker.io` 不一定提供 `docker-compose-plugin`，直接安装会出现 `E: Unable to locate package docker-compose-plugin`。
+
 ```bash
-sudo apt install -y docker.io docker-compose-plugin
+sudo apt update
+sudo apt install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker $USER
 newgrp docker
 ```
+
+如果 WSL2 中 `systemctl` 不可用，先在 Windows PowerShell 中执行：
+
+```powershell
+wsl --shutdown
+```
+
+然后在 Ubuntu 中启用 systemd：
+
+```bash
+sudo tee /etc/wsl.conf <<'EOF'
+[boot]
+systemd=true
+EOF
+```
+
+再重启 Ubuntu 终端后继续执行 Docker 启动命令。
 
 验证：
 ```bash
@@ -457,6 +495,7 @@ http://<server-ip>:8848/nacos
 | 问题 | 可能原因 | 解决办法 |
 |------|---------|---------|
 | `docker: command not found` | Docker 未安装 | 安装 Docker 和 Docker Compose 插件 |
+| `E: Unable to locate package docker-compose-plugin` | 使用了 Ubuntu 默认源，未配置 Docker 官方 apt 源 | 按“安装 Docker”章节添加 Docker 官方源，或在 Windows 安装 Docker Desktop 并启用 WSL integration |
 | `Cannot connect to the Docker daemon` | 当前用户未加入 docker 组 | 执行 `sudo usermod -aG docker $USER` 后重新登录 |
 | Java 找不到 | JDK 未安装 | 安装 `openjdk-17-jdk` |
 | Maven 父 POM 解析失败 | 没在仓库根目录执行或本地缓存过旧 | 回到仓库根目录执行，刷新 Maven 缓存后重试 |
