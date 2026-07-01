@@ -30,6 +30,7 @@
         <module>payment-service</module>
         <module>scheduler-service</module>
         <module>admin-service</module>
+        <module>distribution-service</module>
         <module>chat-server</module>
     </modules>
 

@@ -245,6 +245,34 @@ CREATE TABLE IF NOT EXISTS t_refund (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='退款表';
 
 -- ============================================
+-- 分销数据库
+-- ============================================
+CREATE DATABASE IF NOT EXISTS distribution_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE distribution_db;
+
+CREATE TABLE IF NOT EXISTS t_distribution_record (
+    distribution_id      BIGINT       NOT NULL AUTO_INCREMENT COMMENT '分销ID',
+    order_id             BIGINT       NOT NULL COMMENT '订单ID',
+    order_user_id        BIGINT       NOT NULL COMMENT '下单用户ID',
+    distributor_user_id  BIGINT       NOT NULL COMMENT '分销用户ID',
+    product_id           BIGINT       NOT NULL COMMENT '商品ID',
+    order_amount         DECIMAL(10,2) NOT NULL COMMENT '订单金额',
+    commission_rate      DECIMAL(5,2)  NOT NULL COMMENT '佣金比例',
+    commission_amount    DECIMAL(10,2) NOT NULL COMMENT '佣金金额',
+    status               TINYINT      DEFAULT 0 COMMENT '状态: 0已计算 1已结算 2已取消',
+    settled_time         DATETIME     COMMENT '结算时间',
+    remark               VARCHAR(255) COMMENT '备注',
+    create_time          DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    update_time          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted              TINYINT      DEFAULT 0 COMMENT '删除标记',
+    PRIMARY KEY (distribution_id),
+    UNIQUE KEY uk_order_id (order_id),
+    KEY idx_distributor_user_id (distributor_user_id),
+    KEY idx_status (status),
+    KEY idx_distributor_status (distributor_user_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分销记录表';
+
+-- ============================================
 -- 插入测试数据
 -- ============================================
 

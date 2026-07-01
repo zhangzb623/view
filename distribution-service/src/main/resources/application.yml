@@ -1,0 +1,31 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: distribution-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/distribution_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+seata:
+  enabled: true
+  tx-service-group: distribution-service-group

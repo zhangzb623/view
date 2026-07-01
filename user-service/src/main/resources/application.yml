@@ -76,3 +76,7 @@ management:
   endpoint:
     health:
       show-details: always
+
+seata:
+  enabled: true
+  tx-service-group: distribution-service-group

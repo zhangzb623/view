@@ -52,7 +52,7 @@
 
 **任务 1.6：网关服务** - 进行中
 - 网关基础设施（POM、配置、启动类）
-- 用户服务（完成 80%）
+- 用户服务（完成 100%）
   - 实体类（UserDO、UserAddressDO）
   - DTO（CreateUserRequest、UpdateUserRequest、LoginRequest、LoginResponse、UserDTO、UserInfoVO）
   - Mapper（UserMapper、UserAddressMapper）
@@ -71,7 +71,7 @@
   - 服务接口（ProductService）
   - 服务实现（ProductServiceImpl）
   - 控制器（ProductController）
-  - Elasticsearch 集成
+  - 当前阶段使用数据库搜索实现
   - Application.yml
   - bootstrap.yml
   - README.md
@@ -89,10 +89,10 @@
   - Application.yml
   - bootstrap.yml
   - README.md
-- 支付服务（0%）
-- 消息服务（0%）
-- 分发服务（0%）
-- 调度服务（0%）
+- 支付服务（完成 100%）
+- 消息服务（完成 100%）
+- 分发服务（最小可用一版已完成）
+- 调度服务（完成 100%）
 - 管理服务（完成 100%）
   - MongoDB 文档模型
   - DTO（写入、查询、响应、统计）
@@ -100,7 +100,7 @@
   - 服务（操作日志、审计日志、错误日志、统计）
   - 控制器
   - README.md
-- 聊天服务器（0%）
+- 聊天服务器（完成 100%）
 
 ## 项目结构
 
@@ -114,7 +114,7 @@ spring-cloud-learning-system/
 │   └── common-domain/               # 领域模型，已完成
 ├── gateway/                         # 网关服务，待完成
 │   └── gateway-service/             # Spring Cloud Gateway，待完成
-├── user-service/                    # 用户服务，进行中 80%
+├── user-service/                    # 用户服务，已完成 100%
 │   ├── README.md                    # 服务文档，已完成
 │   ├── pom.xml
 │   ├── src/main/java/com/learning/user/
@@ -171,9 +171,9 @@ spring-cloud-learning-system/
 │       ├── application.yml
 │       └── bootstrap.yml
 ├── payment-service/                 # 支付服务，已完成 100%
-├── message-service/                 # 消息服务，待完成
-├── distribution-service/            # 分发服务，待完成
-├── scheduler-service/               # 调度服务，待完成
+├── message-service/                 # 消息服务，已完成 100%
+├── distribution-service/            # 分发服务，最小可用一版已完成
+├── scheduler-service/               # 调度服务，已完成 100%
 ├── admin-service/                   # 管理服务，已完成 100%
 ├── chat-server/                     # 聊天服务器，已完成
 ├── scripts/                         # 脚本文件，已完成
@@ -223,12 +223,13 @@ spring-cloud-learning-system/
 - 1.6：网关服务 - 30%
 
 ### 阶段 2：核心服务
-- 用户服务 - 80%
+- 用户服务 - 100%
 - 商品服务 - 100%
 - 订单服务 - 100%
 - 支付服务 - 100%
 - 消息服务 - 100%
 - 调度服务 - 100%
+- 分发服务 - 最小可用一版已完成
 
 ### 阶段 3：高级功能
 - 管理服务（MongoDB 日志）
@@ -239,6 +240,9 @@ spring-cloud-learning-system/
   - 会话管理器
   - 路由服务
   - 处理器
+  - 协议文档
+  - 测试文档
+  - TCP 测试脚本
   - README.md
 
 ## 快速开始
@@ -250,7 +254,7 @@ spring-cloud-learning-system/
 - Docker 和 Docker Compose
 - MySQL 8.0
 - Redis 7.0
-- Elasticsearch 7.10+（用于商品服务搜索）
+- MongoDB 6.0+
 
 ### 步骤 1：初始化数据库
 
@@ -297,8 +301,16 @@ mvn spring-boot:run
 cd ../message-service
 mvn spring-boot:run
 
+# 启动调度服务
+cd ../scheduler-service
+mvn spring-boot:run
+
 # 启动管理服务
 cd ../admin-service
+mvn spring-boot:run
+
+# 启动聊天服务器
+cd ../chat-server
 mvn spring-boot:run
 ```
 
@@ -339,157 +351,29 @@ curl -X GET http://localhost:8083/api/product/categories
 curl -X GET "http://localhost:8083/api/product/top-sales?limit=5"
 ```
 
-#### 订单服务
-
+#### 聊天服务器
 ```bash
-# 创建订单
-curl -X POST http://localhost:8084/api/order/create \
-  -H "Content-Type: application/json" \
-  -H "X-User-Id: 1" \
-  -d '{
-    "productId": 1,
-    "productName": "iPhone 15 Pro",
-    "quantity": 1,
-    "unitPrice": 7999.00,
-    "totalPrice": 7999.00,
-    "paymentMethod": 3,
-    "address": "广东省深圳市南山区",
-    "receiver": "张三",
-    "receiverPhone": "13800138000"
-  }'
+# 启动 Chat Server
+mvn -pl chat-server spring-boot:run
 
-# 支付订单
-curl -X POST "http://localhost:8084/api/order/1/pay?transactionId=TXN123&paymentMethod=3"
-
-# 获取订单
-curl -X GET http://localhost:8084/api/order/1
-
-# 取消订单
-curl -X POST http://localhost:8084/api/order/cancel \
-  -H "Content-Type: application/json" \
-  -d '{"orderId": 1, "cancelReason": "不想要了"}'
-
-# 获取订单列表
-curl -X GET "http://localhost:8084/api/order/user/list?userId=1&page=1&size=10"
-
-# 发货
-curl -X POST "http://localhost:8084/api/order/1/ship?trackingNumber=SF123456789"
-
-# 完成订单
-curl -X POST http://localhost:8084/api/order/1/complete
+# 在项目根目录执行 TCP 测试脚本
+python chat-server/scripts/chat_test_client.py
 ```
 
-#### 支付服务
+更详细的协议、测试用例和预期行为见：
+- `chat-server/PROTOCOL.md`
+- `chat-server/TESTING.md`
+- `chat-server/TCP-TEST-SCRIPT-GUIDE.md`
 
-```bash
-# 创建支付
-curl -X POST http://localhost:8085/api/payment/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "orderId": 1,
-    "userId": 1,
-    "paymentMethod": 3,
-    "amount": 7999.00
-  }'
+#### 其他服务
+各服务的详细调用示例请查看对应 README：
+- `user-service/README.md`
+- `product-service/README.md`
+- `order-service/README.md`
+- `payment-service/README.md`
+- `message-service/README.md`
+- `admin-service/README.md`
 
-# 调用第三方支付
-curl -X POST http://localhost:8085/api/payment/1/pay
-
-# 获取支付信息
-curl -X GET http://localhost:8085/api/payment/1
-
-# 创建退款
-curl -X POST http://localhost:8085/api/payment/refund/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "paymentId": 1,
-    "refundAmount": 7999.00,
-    "refundReason": "不想要了"
-  }'
-```
-
-#### 消息服务
-
-```bash
-# 创建消息
-curl -X POST http://localhost:8086/api/message/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": 1,
-    "messageType": 1,
-    "title": "订单通知",
-    "content": "您的订单已创建",
-    "important": 1,
-    "businessId": "1001",
-    "businessType": "order",
-    "source": 1
-  }'
-
-# 获取消息
-curl -X GET http://localhost:8086/api/message/1
-
-# 获取用户消息
-curl -X GET "http://localhost:8086/api/message/user/list?userId=1&page=1&size=10"
-
-# 标记为已读
-curl -X POST http://localhost:8086/api/message/1/read
-
-# 统计未读数
-curl -X GET http://localhost:8086/api/message/user/1/unread/count
-```
-
-#### 管理服务
-
-```bash
-# 写入操作日志
-curl -X POST http://localhost:8088/api/admin/logs/operation \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "order-service",
-    "operatorId": 1,
-    "operatorName": "system",
-    "operationType": "CREATE_ORDER",
-    "businessType": "order",
-    "businessId": "1001",
-    "requestPath": "/api/order/create",
-    "requestMethod": "POST",
-    "resultStatus": 200,
-    "resultMessage": "success",
-    "ip": "127.0.0.1"
-  }'
-
-# 写入审计日志
-curl -X POST http://localhost:8088/api/admin/logs/audit \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "payment-service",
-    "businessType": "payment",
-    "businessId": "2001",
-    "beforeStatus": "PROCESSING",
-    "afterStatus": "SUCCESS",
-    "action": "PAYMENT_CALLBACK",
-    "reason": "gateway callback",
-    "operatorId": 1,
-    "traceId": "trace-001"
-  }'
-
-# 写入错误日志
-curl -X POST http://localhost:8088/api/admin/logs/error \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "scheduler-service",
-    "businessType": "task",
-    "businessId": "job-001",
-    "errorCode": "TASK_EXEC_FAIL",
-    "errorMessage": "job execution failed",
-    "stackSummary": "java.lang.RuntimeException: job execution failed",
-    "traceId": "trace-002",
-    "severity": "HIGH"
-  }'
-
-# 获取概览统计
-curl -X GET http://localhost:8088/api/admin/logs/statistics/overview
-```
 
 ## 文档
 
@@ -498,11 +382,15 @@ curl -X GET http://localhost:8088/api/admin/logs/statistics/overview
 - [Ubuntu 服务器部署指南（中文版）](docs/Ubuntu-Deployment-CN.md)
 - [Ubuntu 部署简版 Runbook（中文版）](docs/Ubuntu-Deployment-Runbook-CN.md)
 - [未来功能索引](docs/future-features/README.md)
+- [阶段进展总结](docs/Progress-Summary.md)
+- [编译成功后的下一步](docs/Next-Steps-After-Compile-Success.md)
 - [用户服务 README](user-service/README.md)
 - [商品服务 README](product-service/README.md)
 - [订单服务 README](order-service/README.md)
 - [支付服务 README](payment-service/README.md)
 - [消息服务 README](message-service/README.md)
+- [分发服务 README](distribution-service/README.md)
+- [分发服务测试说明](distribution-service/TESTING.md)
 - [管理服务 README](admin-service/README.md)
 - [聊天服务器 README](chat-server/README.md)
 

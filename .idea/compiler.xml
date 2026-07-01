@@ -13,6 +13,7 @@
         <module name="user-service" />
         <module name="message-service" />
         <module name="common-api" />
+        <module name="distribution-service" />
         <module name="payment-service" />
         <module name="common-starter" />
         <module name="gateway-service" />

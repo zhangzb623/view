@@ -52,7 +52,7 @@ A comprehensive Spring Cloud microservices learning platform demonstrating all 1
 
 **Task 1.6: Gateway Service** - 🔄 IN PROGRESS
 - ✅ Gateway infrastructure (POM, config, application class)
-- ✅ User Service (80% complete)
+- ✅ User Service (100% complete)
   - ✅ Entity classes (UserDO, UserAddressDO)
   - ✅ DTOs (CreateUserRequest, UpdateUserRequest, LoginRequest, LoginResponse, UserDTO, UserInfoVO)
   - ✅ Mappers (UserMapper, UserAddressMapper)
@@ -71,11 +71,11 @@ A comprehensive Spring Cloud microservices learning platform demonstrating all 1
   - ✅ Service interface (ProductService)
   - ✅ Service implementation (ProductServiceImpl)
   - ✅ Controller (ProductController)
-  - ✅ Elasticsearch integration
+  - ✅ Database-backed search implementation
   - ✅ Application.yml
   - ✅ bootstrap.yml
   - ✅ README.md
-- 🔄 Order Service (100% complete)
+- ✅ Order Service (100% complete)
   - ✅ Entity classes (OrderDO)
   - ✅ DTOs (CreateOrderRequest, OrderDTO, OrderQueryRequest, CancelOrderRequest)
   - ✅ Mappers (OrderMapper with custom queries)
@@ -89,10 +89,10 @@ A comprehensive Spring Cloud microservices learning platform demonstrating all 1
   - ✅ Application.yml
   - ✅ bootstrap.yml
   - ✅ README.md
-- ⬜ Payment Service (0%)
-- ⬜ Message Service (0%)
-- ⬜ Distribution Service (0%)
-- ⬜ Scheduler Service (0%)
+- ✅ Payment Service (100% complete)
+- ✅ Message Service (100% complete)
+- ✅ Distribution Service (minimal first slice complete)
+- ✅ Scheduler Service (100% complete)
 - ✅ Admin Service (100% complete)
   - ✅ MongoDB document models
   - ✅ DTOs (write/query/response/statistics)
@@ -100,7 +100,7 @@ A comprehensive Spring Cloud microservices learning platform demonstrating all 1
   - ✅ Services (operation/audit/error/statistics)
   - ✅ Controllers
   - ✅ README.md
-- ⬜ Chat Server (0%)
+- ✅ Chat Server (100% complete)
 
 ## Project Structure
 
@@ -114,7 +114,7 @@ spring-cloud-learning-system/
 │   └── common-domain/               # 领域模型 ✅
 ├── gateway/                         # 网关服务 ⬜
 │   └── gateway-service/             # Spring Cloud Gateway ⬜
-├── user-service/                    # 用户服务 🔄 80%
+├── user-service/                    # User service ✅ 100%
 │   ├── README.md                    # 服务文档 ✅
 │   ├── pom.xml
 │   ├── src/main/java/com/learning/user/
@@ -159,7 +159,7 @@ spring-cloud-learning-system/
 │   │   │   └── impl/
 │   │   │       └── ProductServiceImpl.java ✅
 │   │   └── repository/
-│   │       └── (Elasticsearch repositories will be added)
+│   │       └── (search implementation is database-backed in the current phase)
 │   └── src/main/resources/
 │       ├── application.yml ✅
 │       └── bootstrap.yml ✅
@@ -231,9 +231,9 @@ spring-cloud-learning-system/
 │   └── src/main/resources/
 │       ├── application.yml ✅
 │       └── bootstrap.yml ✅
-├── message-service/                 # 消息服务 ⬜
-├── distribution-service/            # 分发服务 ⬜
-├── scheduler-service/               # 调度服务 ⬜
+├── message-service/                 # Message service ✅ 100%
+├── distribution-service/            # Distribution service ✅ first slice
+├── scheduler-service/               # Scheduler service ✅ 100%
 ├── admin-service/                   # 管理服务 ✅ 100%
 │   ├── README.md                    # 服务文档 ✅
 │   ├── pom.xml
@@ -327,12 +327,13 @@ spring-cloud-learning-system/
 - 🔄 1.6: Gateway Service - 30%
 
 ### Phase 2: Core Services
-- ✅ User Service - 80%
+- ✅ User Service - 100%
 - ✅ Product Service - 100%
 - ✅ Order Service - 100%
 - ✅ Payment Service - 100%
 - ✅ Message Service - 100%
 - ✅ Scheduler Service - 100%
+- ✅ Distribution Service - first slice complete
 
 ### Phase 3: Advanced Features
 - ✅ Admin service (MongoDB logs)
@@ -343,6 +344,9 @@ spring-cloud-learning-system/
   - ✅ session manager
   - ✅ routing service
   - ✅ handlers
+  - ✅ protocol docs
+  - ✅ testing docs
+  - ✅ TCP test script
   - ✅ README.md
 
 ## Quick Start
@@ -354,7 +358,7 @@ spring-cloud-learning-system/
 - Docker & Docker Compose
 - MySQL 8.0
 - Redis 7.0
-- Elasticsearch 7.10+ (for Product Service search)
+- MongoDB 6.0+
 
 ### Step 1: Initialize Databases
 
@@ -401,8 +405,16 @@ mvn spring-boot:run
 cd ../message-service
 mvn spring-boot:run
 
+# Start Scheduler Service
+cd ../scheduler-service
+mvn spring-boot:run
+
 # Start Admin Service
 cd ../admin-service
+mvn spring-boot:run
+
+# Start Chat Server
+cd ../chat-server
 mvn spring-boot:run
 ```
 
@@ -441,297 +453,53 @@ curl -X GET http://localhost:8083/api/product/categories
 curl -X GET "http://localhost:8083/api/product/top-sales?limit=5"
 ```
 
-#### Order Service
+#### Chat Server
 ```bash
-# Create Order
-curl -X POST http://localhost:8084/api/order/create \
-  -H "Content-Type: application/json" \
-  -H "X-User-Id: 1" \
-  -d '{
-    "productId": 1,
-    "productName": "iPhone 15 Pro",
-    "quantity": 1,
-    "unitPrice": 7999.00,
-    "totalPrice": 7999.00,
-    "paymentMethod": 3,
-    "address": "广东省深圳市南山区",
-    "receiver": "张三",
-    "receiverPhone": "13800138000"
-  }'
+# Start Chat Server
+mvn -pl chat-server spring-boot:run
 
-# Pay Order
-curl -X POST "http://localhost:8084/api/order/1/pay?transactionId=TXN123&paymentMethod=3"
-
-# Get Order
-curl -X GET http://localhost:8084/api/order/1
-
-# Cancel Order
-curl -X POST http://localhost:8084/api/order/cancel \
-  -H "Content-Type: application/json" \
-  -d '{"orderId": 1, "cancelReason": "不想要了"}'
-
-# Get Order List
-curl -X GET "http://localhost:8084/api/order/user/list?userId=1&page=1&size=10"
-
-# Ship Order
-curl -X POST "http://localhost:8084/api/order/1/ship?trackingNumber=SF123456789"
-
-# Complete Order
-curl -X POST http://localhost:8084/api/order/1/complete
-
-# Payment Service
-```bash
-# Create Payment
-curl -X POST http://localhost:8085/api/payment/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "orderId": 1,
-    "userId": 1,
-    "paymentMethod": 3,
-    "amount": 7999.00
-  }'
-
-# Call Third Party Payment
-curl -X POST http://localhost:8085/api/payment/1/pay
-
-# Get Payment
-curl -X GET http://localhost:8085/api/payment/1
-
-# Create Refund
-curl -X POST http://localhost:8085/api/payment/refund/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "paymentId": 1,
-    "refundAmount": 7999.00,
-    "refundReason": "不想要了"
-  }'
-
-# Message Service
-```bash
-# Create Message
-curl -X POST http://localhost:8086/api/message/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": 1,
-    "messageType": 1,
-    "title": "订单通知",
-    "content": "您的订单已创建",
-    "important": 1,
-    "businessId": "1001",
-    "businessType": "order",
-    "source": 1
-  }'
-
-# Get Message
-curl -X GET http://localhost:8086/api/message/1
-
-# Get User Messages
-curl -X GET "http://localhost:8086/api/message/user/list?userId=1&page=1&size=10"
-
-# Mark as Read
-curl -X POST http://localhost:8086/api/message/1/read
-
-# Count Unread
-curl -X GET http://localhost:8086/api/message/user/1/unread/count
+# Run TCP test script from project root
+python chat-server/scripts/chat_test_client.py
 ```
 
-#### Admin Service
+For detailed protocol, test cases, and expected behavior, see:
+- `chat-server/PROTOCOL.md`
+- `chat-server/TESTING.md`
+- `chat-server/TCP-TEST-SCRIPT-GUIDE.md`
+
+#### Other Services
+Detailed request examples are maintained in each service README:
+- `user-service/README.md`
+- `product-service/README.md`
+- `order-service/README.md`
+- `payment-service/README.md`
+- `message-service/README.md`
+- `admin-service/README.md`
+
+
+#### Chat Server
 ```bash
-# Write Operation Log
-curl -X POST http://localhost:8088/api/admin/logs/operation \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "order-service",
-    "operatorId": 1,
-    "operatorName": "system",
-    "operationType": "CREATE_ORDER",
-    "businessType": "order",
-    "businessId": "1001",
-    "requestPath": "/api/order/create",
-    "requestMethod": "POST",
-    "resultStatus": 200,
-    "resultMessage": "success",
-    "ip": "127.0.0.1"
-  }'
+# Start Chat Server
+mvn -pl chat-server spring-boot:run
 
-# Write Audit Log
-curl -X POST http://localhost:8088/api/admin/logs/audit \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "payment-service",
-    "businessType": "payment",
-    "businessId": "2001",
-    "beforeStatus": "PROCESSING",
-    "afterStatus": "SUCCESS",
-    "action": "PAYMENT_CALLBACK",
-    "reason": "gateway callback",
-    "operatorId": 1,
-    "traceId": "trace-001"
-  }'
-
-# Write Error Log
-curl -X POST http://localhost:8088/api/admin/logs/error \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "scheduler-service",
-    "businessType": "task",
-    "businessId": "job-001",
-    "errorCode": "TASK_EXEC_FAIL",
-    "errorMessage": "job execution failed",
-    "stackSummary": "java.lang.RuntimeException: job execution failed",
-    "traceId": "trace-002",
-    "severity": "HIGH"
-  }'
-
-# Get Overview Statistics
-curl -X GET http://localhost:8088/api/admin/logs/statistics/overview
+# Run TCP test script from project root
+python chat-server/scripts/chat_test_client.py
 ```
 
-#### Order Service
-```bash
-# Create Order
-curl -X POST http://localhost:8084/api/order/create \
-  -H "Content-Type: application/json" \
-  -H "X-User-Id: 1" \
-  -d '{
-    "productId": 1,
-    "productName": "iPhone 15 Pro",
-    "quantity": 1,
-    "unitPrice": 7999.00,
-    "totalPrice": 7999.00,
-    "paymentMethod": 3,
-    "address": "广东省深圳市南山区",
-    "receiver": "张三",
-    "receiverPhone": "13800138000"
-  }'
+For detailed protocol, test cases, and expected behavior, see:
+- `chat-server/PROTOCOL.md`
+- `chat-server/TESTING.md`
+- `chat-server/TCP-TEST-SCRIPT-GUIDE.md`
 
-# Pay Order
-curl -X POST "http://localhost:8084/api/order/1/pay?transactionId=TXN123&paymentMethod=3"
+#### Other Services
+Detailed request examples are maintained in each service README:
+- `user-service/README.md`
+- `product-service/README.md`
+- `order-service/README.md`
+- `payment-service/README.md`
+- `message-service/README.md`
+- `admin-service/README.md`
 
-# Get Order
-curl -X GET http://localhost:8084/api/order/1
-
-# Cancel Order
-curl -X POST http://localhost:8084/api/order/cancel \
-  -H "Content-Type: application/json" \
-  -d '{"orderId": 1, "cancelReason": "不想要了"}'
-
-# Get Order List
-curl -X GET "http://localhost:8084/api/order/user/list?userId=1&page=1&size=10"
-
-# Ship Order
-curl -X POST "http://localhost:8084/api/order/1/ship?trackingNumber=SF123456789"
-
-# Complete Order
-curl -X POST http://localhost:8084/api/order/1/complete
-
-# Payment Service
-```bash
-# Create Payment
-curl -X POST http://localhost:8085/api/payment/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "orderId": 1,
-    "userId": 1,
-    "paymentMethod": 3,
-    "amount": 7999.00
-  }'
-
-# Call Third Party Payment
-curl -X POST http://localhost:8085/api/payment/1/pay
-
-# Get Payment
-curl -X GET http://localhost:8085/api/payment/1
-
-# Create Refund
-curl -X POST http://localhost:8085/api/payment/refund/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "paymentId": 1,
-    "refundAmount": 7999.00,
-    "refundReason": "不想要了"
-  }'
-
-# Message Service
-```bash
-# Create Message
-curl -X POST http://localhost:8086/api/message/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": 1,
-    "messageType": 1,
-    "title": "订单通知",
-    "content": "您的订单已创建",
-    "important": 1,
-    "businessId": "1001",
-    "businessType": "order",
-    "source": 1
-  }'
-
-# Get Message
-curl -X GET http://localhost:8086/api/message/1
-
-# Get User Messages
-curl -X GET "http://localhost:8086/api/message/user/list?userId=1&page=1&size=10"
-
-# Mark as Read
-curl -X POST http://localhost:8086/api/message/1/read
-
-# Count Unread
-curl -X GET http://localhost:8086/api/message/user/1/unread/count
-```
-
-#### Admin Service
-```bash
-# Write Operation Log
-curl -X POST http://localhost:8088/api/admin/logs/operation \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "order-service",
-    "operatorId": 1,
-    "operatorName": "system",
-    "operationType": "CREATE_ORDER",
-    "businessType": "order",
-    "businessId": "1001",
-    "requestPath": "/api/order/create",
-    "requestMethod": "POST",
-    "resultStatus": 200,
-    "resultMessage": "success",
-    "ip": "127.0.0.1"
-  }'
-
-# Write Audit Log
-curl -X POST http://localhost:8088/api/admin/logs/audit \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "payment-service",
-    "businessType": "payment",
-    "businessId": "2001",
-    "beforeStatus": "PROCESSING",
-    "afterStatus": "SUCCESS",
-    "action": "PAYMENT_CALLBACK",
-    "reason": "gateway callback",
-    "operatorId": 1,
-    "traceId": "trace-001"
-  }'
-
-# Write Error Log
-curl -X POST http://localhost:8088/api/admin/logs/error \
-  -H "Content-Type: application/json" \
-  -d '{
-    "serviceName": "scheduler-service",
-    "businessType": "task",
-    "businessId": "job-001",
-    "errorCode": "TASK_EXEC_FAIL",
-    "errorMessage": "job execution failed",
-    "stackSummary": "java.lang.RuntimeException: job execution failed",
-    "traceId": "trace-002",
-    "severity": "HIGH"
-  }'
-
-# Get Overview Statistics
-curl -X GET http://localhost:8088/api/admin/logs/statistics/overview
-```
 
 ## Documentation
 
@@ -740,11 +508,15 @@ curl -X GET http://localhost:8088/api/admin/logs/statistics/overview
 - [Ubuntu 服务器部署指南（中文版）](docs/Ubuntu-Deployment-CN.md)
 - [Ubuntu 部署简版 Runbook（中文版）](docs/Ubuntu-Deployment-Runbook-CN.md)
 - [Future Features Index](docs/future-features/README.md)
+- [Progress Summary](docs/Progress-Summary.md)
+- [Next Steps After Compile Success](docs/Next-Steps-After-Compile-Success.md)
 - [User Service README](user-service/README.md)
 - [Product Service README](product-service/README.md)
 - [Order Service README](order-service/README.md)
 - [Payment Service README](payment-service/README.md)
 - [Message Service README](message-service/README.md)
+- [Distribution Service README](distribution-service/README.md)
+- [Distribution Service Testing Guide](distribution-service/TESTING.md)
 - [Admin Service README](admin-service/README.md)
 - [Chat Server README](chat-server/README.md)
 

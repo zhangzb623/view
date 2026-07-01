@@ -40,6 +40,12 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
 
+        <!-- Seata -->
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-spring-boot-starter</artifactId>
+        </dependency>
+
         <!-- Common Domain -->
         <dependency>
             <groupId>com.learning</groupId>
