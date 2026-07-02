@@ -322,6 +322,16 @@ docker exec -i learning-mysql mysql -uroot -proot < scripts/mysql/xxl-job.sql
 docker exec -i learning-mysql mysql -uroot -proot < scripts/mysql/seata.sql
 ```
 
+如果你之前执行 `init.sql` 时遇到类似下面的错误：
+
+```text
+ERROR 1146 (42S02): Table 'distribution_db.t_user_info' doesn't exist
+```
+
+说明旧版本 `init.sql` 在新增 `distribution_db` 后，没有在测试数据插入前切回 `user_db` / `product_db` / `payment_db`。当前仓库已修复这个问题，重新执行最新的 `scripts/mysql/init.sql` 即可。
+
+如果你之前执行 `seata.sql` 时遇到字段不匹配或索引引用不存在的问题，说明旧版本脚本里有不合理的 Seata 表结构（例如索引引用了未定义的 `status` 字段，或者混入了与当前 Seata 初始化不一致的字段命名）。当前仓库已整理成更安全的初始化版本，建议直接执行最新版 `scripts/mysql/seata.sql`。
+
 验证数据库：
 
 ```bash

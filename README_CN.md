@@ -381,6 +381,7 @@ python chat-server/scripts/chat_test_client.py
 - [Ubuntu 服务器部署指南](docs/Ubuntu-Deployment.md)
 - [Ubuntu 服务器部署指南（中文版）](docs/Ubuntu-Deployment-CN.md)
 - [Ubuntu 部署简版 Runbook（中文版）](docs/Ubuntu-Deployment-Runbook-CN.md)
+- [Win10 + WSL2 分发 / Seata 最短执行清单（中文版）](docs/Win10-WSL2-Distribution-Seata-Runbook-CN.md)
 - [未来功能索引](docs/future-features/README.md)
 - [阶段进展总结](docs/Progress-Summary.md)
 - [编译成功后的下一步](docs/Next-Steps-After-Compile-Success.md)

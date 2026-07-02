@@ -507,6 +507,7 @@ Detailed request examples are maintained in each service README:
 - [Ubuntu Server Deployment Guide](docs/Ubuntu-Deployment.md)
 - [Ubuntu 服务器部署指南（中文版）](docs/Ubuntu-Deployment-CN.md)
 - [Ubuntu 部署简版 Runbook（中文版）](docs/Ubuntu-Deployment-Runbook-CN.md)
+- [Win10 + WSL2 Distribution / Seata Runbook（中文版）](docs/Win10-WSL2-Distribution-Seata-Runbook-CN.md)
 - [Future Features Index](docs/future-features/README.md)
 - [Progress Summary](docs/Progress-Summary.md)
 - [Next Steps After Compile Success](docs/Next-Steps-After-Compile-Success.md)

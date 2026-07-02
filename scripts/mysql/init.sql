@@ -276,12 +276,21 @@ CREATE TABLE IF NOT EXISTS t_distribution_record (
 -- 插入测试数据
 -- ============================================
 
+USE user_db;
+
 -- 用户数据
 INSERT INTO t_user_info (username, password, phone, email, balance) VALUES
 ('admin', 'password123', '13800138000', 'admin@example.com', 10000.00),
 ('user1', 'password123', '13800138001', 'user1@example.com', 1000.00),
 ('user2', 'password123', '13800138002', 'user2@example.com', 500.00),
 ('user3', 'password123', '13800138003', 'user3@example.com', 2000.00);
+
+-- 地址数据
+INSERT INTO t_user_address (user_id, receiver_name, receiver_phone, province, city, district, detail_address, is_default, status) VALUES
+(1, '张三', '13800138000', '广东省', '深圳市', '南山区', '科技园南区XX路XX号', 1, 1),
+(2, '李四', '13800138001', '广东省', '深圳市', '福田区', 'XX路XX号', 1, 1);
+
+USE product_db;
 
 -- 商品数据
 INSERT INTO t_category (category_id, parent_id, category_name, level, sort_order, status) VALUES
@@ -301,10 +310,7 @@ INSERT INTO t_product (category_id, product_name, product_desc, product_image, u
 (6, '运动休闲裤', '舒适透气，百搭款式', '/images/pants.jpg', 299.00, 200, 1),
 (7, '时尚连衣裙', '优雅气质，连衣裙', '/images/dress.jpg', 499.00, 150, 1);
 
--- 地址数据
-INSERT INTO t_user_address (user_id, receiver_name, receiver_phone, province, city, district, detail_address, is_default, status) VALUES
-(1, '张三', '13800138000', '广东省', '深圳市', '南山区', '科技园南区XX路XX号', 1, 1),
-(2, '李四', '13800138001', '广东省', '深圳市', '福田区', 'XX路XX号', 1, 1);
+USE payment_db;
 
 -- 支付数据
 INSERT INTO t_payment (payment_no, order_id, order_no, user_id, amount, payment_method, status) VALUES
