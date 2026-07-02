@@ -332,6 +332,18 @@ ERROR 1146 (42S02): Table 'distribution_db.t_user_info' doesn't exist
 
 如果你之前执行 `seata.sql` 时遇到字段不匹配或索引引用不存在的问题，说明旧版本脚本里有不合理的 Seata 表结构（例如索引引用了未定义的 `status` 字段，或者混入了与当前 Seata 初始化不一致的字段命名）。当前仓库已整理成更安全的初始化版本，建议直接执行最新版 `scripts/mysql/seata.sql`。
 
+如果你重跑 `scripts/mysql/xxl-job.sql` 时看到类似下面的错误：
+
+```text
+ERROR 1050 (42S01): Table 'xxl_job_info' already exists
+```
+
+说明旧版本脚本不是幂等的。当前仓库已经把 `xxl-job.sql` 整理成可重复执行版本：
+- 建表使用 `CREATE TABLE IF NOT EXISTS`
+- 默认管理员使用 `INSERT IGNORE`
+
+如果你已经拉到最新代码，重新执行最新 `scripts/mysql/xxl-job.sql` 即可。
+
 如果你登录 `xxl-job-admin` 后看到类似下面的错误：
 
 ```text

@@ -6,7 +6,7 @@ CREATE DATABASE IF NOT EXISTS xxl_job DEFAULT CHARACTER SET utf8mb4 COLLATE utf8
 USE xxl_job;
 
 -- 1. xxl_job_info (任务信息表)
-CREATE TABLE `xxl_job_info` (
+CREATE TABLE IF NOT EXISTS `xxl_job_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `job_group` int(11) NOT NULL COMMENT '执行器主键ID',
   `job_cron` varchar(128) NOT NULL COMMENT '任务执行Cron表达式',
@@ -36,7 +36,7 @@ CREATE TABLE `xxl_job_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB任务信息表';
 
 -- 2. xxl_job_log (任务执行日志表)
-CREATE TABLE `xxl_job_log` (
+CREATE TABLE IF NOT EXISTS `xxl_job_log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `job_group` int(11) NOT NULL COMMENT '执行器主键ID',
   `job_id` int(11) NOT NULL COMMENT '任务主键ID',
@@ -59,7 +59,7 @@ CREATE TABLE `xxl_job_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB调度日志表';
 
 -- 3. xxl_job_logglue (GLUE日志)
-CREATE TABLE `xxl_job_logglue` (
+CREATE TABLE IF NOT EXISTS `xxl_job_logglue` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `job_id` int(11) NOT NULL COMMENT '任务ID',
   `glue_type` tinyint(4) NOT NULL COMMENT 'GLUE类型',
@@ -72,7 +72,7 @@ CREATE TABLE `xxl_job_logglue` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB日志GLUE表';
 
 -- 4. xxl_job_registry (执行器注册表)
-CREATE TABLE `xxl_job_registry` (
+CREATE TABLE IF NOT EXISTS `xxl_job_registry` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `registry_group` varchar(255) NOT NULL COMMENT '注册组信息',
   `registry_key` varchar(255) NOT NULL COMMENT '注册键信息',
@@ -84,7 +84,7 @@ CREATE TABLE `xxl_job_registry` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB执行器注册表';
 
 -- 5. xxl_job_group (执行器管理表)
-CREATE TABLE `xxl_job_group` (
+CREATE TABLE IF NOT EXISTS `xxl_job_group` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `app_name` varchar(64) NOT NULL COMMENT '执行器AppName',
   `title` varchar(64) NOT NULL COMMENT '执行器标题',
@@ -101,7 +101,7 @@ CREATE TABLE `xxl_job_group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB执行器管理表';
 
 -- 6. xxl_job_user (用户表)
-CREATE TABLE `xxl_job_user` (
+CREATE TABLE IF NOT EXISTS `xxl_job_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `username` varchar(50) NOT NULL COMMENT '账号',
   `password` varchar(50) NOT NULL COMMENT '密码(加密)',
@@ -114,7 +114,7 @@ CREATE TABLE `xxl_job_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB用户表';
 
 -- 7. xxl_job_log_report (调度报表)
-CREATE TABLE `xxl_job_log_report` (
+CREATE TABLE IF NOT EXISTS `xxl_job_log_report` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `trigger_day` datetime DEFAULT NULL COMMENT '调度日期',
   `running_count` int(11) NOT NULL DEFAULT '0' COMMENT '运行中日志数量',
@@ -126,7 +126,7 @@ CREATE TABLE `xxl_job_log_report` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB调度报表';
 
 -- 8. xxl_job_lock (任务锁)
-CREATE TABLE `xxl_job_lock` (
+CREATE TABLE IF NOT EXISTS `xxl_job_lock` (
   `lock_name` varchar(50) NOT NULL COMMENT '锁名称',
   PRIMARY KEY (`lock_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB任务锁';
@@ -136,7 +136,7 @@ INSERT IGNORE INTO xxl_job_lock (lock_name) VALUES
 ('schedule_lock');
 
 -- 插入默认管理员账号 (密码: 123456)
-INSERT INTO xxl_job_user (username, password, role, permission, create_time, update_time) VALUES
+INSERT IGNORE INTO xxl_job_user (username, password, role, permission, create_time, update_time) VALUES
 ('admin', 'e10adc3949ba59abbe56e057f20f883e', 1, NULL, NOW(), NOW());
 
 SELECT 'xxl-job database initialization completed!' as message;
