@@ -15,39 +15,19 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-
-  # Redis配置
-  redis:
-    host: localhost
-    port: 6379
-    password: root
-    database: 0
-    timeout: 5000ms
-    lettuce:
-      pool:
-        max-active: 8
-        max-wait: -1ms
-        max-idle: 8
-        min-idle: 0
-
-  # MyBatis Plus配置
-  mybatis-plus:
-    mapper-locations: classpath:mapper/**/*.xml
-    type-aliases-package: com.learning.user.entity
-    configuration:
-      map-underscore-to-camel-case: true
-      cache-enabled: true
-      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    global-config:
-      db-config:
-        id-type: auto
-        logic-delete-field: deleted
-        logic-delete-value: 1
-        logic-not-delete-value: 0
-      banner: false
-
-# 服务注册配置
-spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: root
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
   cloud:
     nacos:
       discovery:
@@ -56,18 +36,30 @@ spring:
         group: LEARNING_GROUP
         service: user-service
 
-# JWT配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.learning.user.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+    banner: false
+
 jwt:
   secret: learning-system-secret-key-2024
-  expiration: 7200000  # 2小时
+  expiration: 7200000
   header: Authorization
 
-# 日志配置
 logging:
   level:
     com.learning: DEBUG
 
-# Actuator配置
 management:
   endpoints:
     web:
