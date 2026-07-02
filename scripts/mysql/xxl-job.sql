@@ -113,6 +113,28 @@ CREATE TABLE `xxl_job_user` (
   UNIQUE KEY `I_USERNAME` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB用户表';
 
+-- 7. xxl_job_log_report (调度报表)
+CREATE TABLE `xxl_job_log_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `trigger_day` datetime DEFAULT NULL COMMENT '调度日期',
+  `running_count` int(11) NOT NULL DEFAULT '0' COMMENT '运行中日志数量',
+  `suc_count` int(11) NOT NULL DEFAULT '0' COMMENT '执行成功数量',
+  `fail_count` int(11) NOT NULL DEFAULT '0' COMMENT '执行失败数量',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `I_TRIGGER_DAY` (`trigger_day`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB调度报表';
+
+-- 8. xxl_job_lock (任务锁)
+CREATE TABLE `xxl_job_lock` (
+  `lock_name` varchar(50) NOT NULL COMMENT '锁名称',
+  PRIMARY KEY (`lock_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB任务锁';
+
+-- 初始化锁数据
+INSERT IGNORE INTO xxl_job_lock (lock_name) VALUES
+('schedule_lock');
+
 -- 插入默认管理员账号 (密码: 123456)
 INSERT INTO xxl_job_user (username, password, role, permission, create_time, update_time) VALUES
 ('admin', 'e10adc3949ba59abbe56e057f20f883e', 1, NULL, NOW(), NOW());
