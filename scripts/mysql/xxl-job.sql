@@ -89,13 +89,8 @@ CREATE TABLE IF NOT EXISTS `xxl_job_group` (
   `app_name` varchar(64) NOT NULL COMMENT '执行器AppName',
   `title` varchar(64) NOT NULL COMMENT '执行器标题',
   `address_type` tinyint(4) NOT NULL COMMENT '地址类型：0-自动注册 1-手动录入',
-  `channel_address` varchar(255) DEFAULT NULL COMMENT '自动注册的地址，手动录入的地址',
-  `channel_port` int(11) DEFAULT NULL COMMENT '自动注册的端口',
-  `timeout` int(11) DEFAULT 0 COMMENT '任务超时时间',
-  `executor_log_path` varchar(255) DEFAULT NULL COMMENT '执行器日志文件路径',
-  `executor_logretentiondays` int(11) DEFAULT 0 COMMENT '执行器日志文件保留天数',
-  `executor_logname` varchar(64) DEFAULT NULL COMMENT '执行器日志文件名称',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `address_list` text COMMENT '执行器地址列表，多地址逗号分隔',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `I_APP_NAME` (`app_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='XXL-JOB执行器管理表';

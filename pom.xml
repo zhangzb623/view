@@ -124,8 +124,8 @@
 
             <!-- xxl-job -->
             <dependency>
-                <groupId>io.github.wangrui027</groupId>
-                <artifactId>xxl-job-spring-boot-starter</artifactId>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
                 <version>${xxl-job.version}</version>
             </dependency>
 

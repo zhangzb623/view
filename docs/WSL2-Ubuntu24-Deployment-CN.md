@@ -332,6 +332,19 @@ ERROR 1146 (42S02): Table 'distribution_db.t_user_info' doesn't exist
 
 如果你之前执行 `seata.sql` 时遇到字段不匹配或索引引用不存在的问题，说明旧版本脚本里有不合理的 Seata 表结构（例如索引引用了未定义的 `status` 字段，或者混入了与当前 Seata 初始化不一致的字段命名）。当前仓库已整理成更安全的初始化版本，建议直接执行最新版 `scripts/mysql/seata.sql`。
 
+如果你登录 `xxl-job-admin` 后又看到类似下面的错误：
+
+```text
+Unknown column 't.address_list' in 'field list'
+```
+
+说明当前 `xxl-job-admin` 镜像版本与 `xxl_job_group` 表结构版本不一致。当前仓库已经把 `scripts/mysql/xxl-job.sql` 调整为更接近 `xuxueli/xxl-job-admin:2.4.0` 的结构。如果你之前已经初始化过旧版 `xxl_job` 库，建议先删库再重建：
+
+```bash
+docker exec -it learning-mysql mysql -uroot -proot -e "DROP DATABASE IF EXISTS xxl_job;"
+docker exec -i learning-mysql mysql -uroot -proot < scripts/mysql/xxl-job.sql
+```
+
 如果你重跑 `scripts/mysql/xxl-job.sql` 时看到类似下面的错误：
 
 ```text

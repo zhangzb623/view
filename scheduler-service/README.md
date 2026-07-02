@@ -1,405 +1,347 @@
 # Scheduler Service
 
-调度服务，演示xxl-job分布式任务调度和MongoDB存储。
+调度服务用于演示：
+- `xxl-job` 分布式任务调度
+- MongoDB 任务日志存储
+- 官方 `xxl-job-core` 接法
 
-## 功能列表
+当前这版已经不再依赖第三方 starter，而是改成：
+- `com.xuxueli:xxl-job-core`
+- 自定义 `XxlJobConfig`
+- 官方 `@XxlJob` + `XxlJobHelper`
 
-### 1. 任务管理
-- ✅ xxl-job任务注册
-- ✅ 测试任务
-- ✅ 数据统计任务
-- ✅ 订单超时检查任务
-- ✅ 缓存清理任务
-- ✅ 报表生成任务
-- ✅ 邮件通知任务
+这更适合学习和复盘，因为能直接看到 executor 配置和 handler 注册方式。
 
-### 2. 任务日志（MongoDB）
-- ✅ 任务执行日志记录
-- ✅ 任务执行结果保存
-- ✅ 任务执行时间统计
-- ✅ 任务执行次数统计
-- ✅ 任务成功率统计
+---
 
-### 3. 任务查询
-- ✅ 根据任务名称查询日志
-- ✅ 根据状态查询日志
-- ✅ 分页查询任务日志
-- ✅ 任务执行统计
+## 当前能力
 
-### 4. 数据统计
-- ✅ 任务执行次数统计
-- ✅ 任务成功/失败统计
-- ✅ 任务成功率计算
+### 已完成
+- Spring Boot 服务骨架
+- MongoDB 任务日志服务
+- 任务日志查询与统计接口
+- 官方 `xxl-job-core` 接入
+- 自定义 `XxlJobSpringExecutor` 配置
+- 两类任务 handler：
+  - `TestTaskHandler`
+  - `MailNotificationTaskHandler`
 
-## 技术实现
+### 当前范围内不做
+- 真正的邮件发送
+- 真正的订单超时清理数据库逻辑
+- 真正的报表文件生成
+- 多节点执行器集群治理
+- 复杂失败重试策略
 
-### 依赖技术
-- **Spring Boot 3.2.0**: 基础框架
-- **Spring Cloud**: 微服务架构
-- **MyBatis Plus 3.5.5**: ORM框架（辅助）
-- **MongoDB 6.0**: NoSQL数据库
-- **xxl-job 2.4.0**: 分布式任务调度
-- **Common Domain**: 基础实体类
-- **Common Starter**: 通用组件
+---
 
-### 核心功能实现
+## 服务端口
 
-#### 1. xxl-job任务注册
-```java
-@Component
-public class TestTaskHandler {
-    public void testJob() {
-        String jobParam = XxlJobHelper.getJobParam();
-        log.info("任务执行: jobId={}, jobParam={}", XxlJobHelper.getJobId(), jobParam);
+- `8087`
 
-        XxlJobHelper.handleSuccess(result);
-    }
-}
+---
+
+## 核心接入方式
+
+当前项目已经切换为官方接法：
+
+### Maven 依赖
+
+`scheduler-service/pom.xml` 使用：
+
+```xml
+<dependency>
+    <groupId>com.xuxueli</groupId>
+    <artifactId>xxl-job-core</artifactId>
+</dependency>
 ```
 
-#### 2. xxl-job配置
+### 配置类
+
+执行器配置类：
+
+- `scheduler-service/src/main/java/com/learning/scheduler/config/XxlJobConfig.java`
+
+当前会显式创建：
+- `XxlJobSpringExecutor`
+
+并绑定这些配置：
+- `xxl.job.admin.addresses`
+- `xxl.job.executor.appname`
+- `xxl.job.executor.ip`
+- `xxl.job.executor.port`
+- `xxl.job.executor.logpath`
+- `xxl.job.executor.logretentiondays`
+- `xxl.job.accessToken`
+
+### Handler 注册方式
+
+当前 handler 使用官方注解：
+
+- `@XxlJob("testJob")`
+- `@XxlJob("statisticsJob")`
+- `@XxlJob("orderTimeoutJob")`
+- `@XxlJob("cacheCleanupJob")`
+- `@XxlJob("reportJob")`
+- `@XxlJob("sendDailyReportJob")`
+
+并使用：
+- `XxlJobHelper.getJobParam()`
+- `XxlJobHelper.getJobId()`
+- `XxlJobHelper.handleSuccess(...)`
+- `XxlJobHelper.handleFail(...)`
+
+---
+
+## 配置说明
+
+配置文件：
+- `scheduler-service/src/main/resources/application.yml`
+
+当前关键配置：
+
 ```yaml
-spring:
-  xxl:
-    job:
-      admin:
-        addresses: http://localhost:8080/xxl-job-admin
-      executor:
-        appname: scheduler-service
-        port: 9999
-        logpath: /data/applogs/xxl-job/jobhandler
-        logretentiondays: 30
-      accessToken: ''
+xxl:
+  job:
+    admin:
+      addresses: http://localhost:8080/xxl-job-admin
+    executor:
+      appname: scheduler-service
+      ip:
+      port: 9999
+      logpath: /data/applogs/xxl-job/jobhandler
+      logretentiondays: 30
+    accessToken: ''
 ```
 
-#### 3. 任务执行流程
-```
-xxl-job admin
-  → 调度任务（触发时间到达）
-  → 发送任务到执行器
-    → TestTaskHandler.testJob()
-      → 获取任务参数
-        → 执行业务逻辑
-          → 返回执行结果
-            → 保存到MongoDB
-              → 更新执行时间
-```
+### 字段含义
 
-#### 4. MongoDB存储
-```java
-@Document(collection = "task_logs")
-public class TaskLogDO {
-    @Id
-    private String jobId;
-    private String jobName;
-    private Integer status;
-    private String handleResult;
-    private Long executeTime;
-    private LocalDateTime createTime;
-}
-```
+| 配置项 | 说明 |
+| --- | --- |
+| `admin.addresses` | xxl-job-admin 地址 |
+| `executor.appname` | 执行器 appname，必须和管理台配置一致 |
+| `executor.ip` | 执行器 IP，留空时由框架自行处理 |
+| `executor.port` | 执行器端口 |
+| `executor.logpath` | 任务日志路径 |
+| `executor.logretentiondays` | 日志保留天数 |
+| `accessToken` | admin / executor 通信令牌 |
 
-## API接口
+---
 
-### 基础路径
-`http://localhost:8087/api/task-log`
+## 当前任务处理器
 
-### 任务日志接口
+### 1. TestTaskHandler
 
-#### 查询任务日志
-```
-GET /list?jobName=xxx&status=0&page=1&size=10
-```
+文件：
+- `scheduler-service/src/main/java/com/learning/scheduler/handler/TestTaskHandler.java`
 
-#### 根据任务名称查询日志
-```
-GET /job/{jobName}
-```
+当前提供：
+- `testJob`
+- `statisticsJob`
+- `orderTimeoutJob`
+- `cacheCleanupJob`
+- `reportJob`
 
-#### 查询成功日志
-```
-GET /success
-```
+这些任务当前主要用于：
+- 演示任务执行流程
+- 演示 handler 注册方式
+- 演示成功/失败回调
 
-#### 查询失败日志
-```
-GET /fail
-```
+### 2. MailNotificationTaskHandler
 
-#### 统计任务执行次数
-```
-GET /count/{jobName}
-```
+文件：
+- `scheduler-service/src/main/java/com/learning/scheduler/handler/MailNotificationTaskHandler.java`
 
-#### 统计任务成功次数
-```
-GET /count/success/{jobName}
-```
+当前提供：
+- `sendDailyReportJob`
 
-#### 统计任务失败次数
-```
-GET /count/fail/{jobName}
-```
+当前行为：
+- 模拟获取待发邮件用户
+- 模拟发送邮件
+- 通过 `XxlJobHelper` 返回执行结果
 
-#### 获取任务统计信息
-```
-GET /statistics/{jobName}
-```
+---
 
-## xxl-job配置
+## MongoDB 日志相关
 
-### 执行器配置
-```yaml
-spring:
-  xxl:
-    job:
-      executor:
-        appname: scheduler-service
-        port: 9999
-        logpath: /data/applogs/xxl-job/jobhandler
-        logretentiondays: 30
-```
+调度服务除了 xxl-job 执行器，还带有一套 MongoDB 任务日志演示。
 
-### 任务管理
-在xxl-job管理控制台创建任务：
-- **JobHandler**: testJob
-- **Cron**: 0 0 2 * * ? (每天凌晨2点执行)
-- **运行模式**: BEAN
-- **JobHandler**: testJob
-- **调度机器**: 所有机器
-- **阻塞处理策略**: 单机串行
-- **路由策略**: FIRST
+### 关键目录
+- `scheduler-service/src/main/java/com/learning/scheduler/entity/`
+- `scheduler-service/src/main/java/com/learning/scheduler/repository/`
+- `scheduler-service/src/main/java/com/learning/scheduler/service/`
+- `scheduler-service/src/main/java/com/learning/scheduler/controller/`
 
-## 任务处理器
+### 用途
+- 记录任务执行日志
+- 按任务名 / 状态查询日志
+- 做成功 / 失败统计
 
-### TestTaskHandler
-```java
-@Component
-public class TestTaskHandler {
-    public void testJob() {
-        // 测试任务
-    }
-}
-```
+这部分更偏“管理 / 查询 / 统计演示”，不是 xxl-job-admin 内置表的替代品。
 
-### MailNotificationTaskHandler
-```java
-@Component
-public class MailNotificationTaskHandler {
-    public void sendDailyReportJob() {
-        // 邮件通知任务
-    }
-}
-```
+---
 
-### 其他任务
-- **statisticsJob**: 数据统计任务
-- **orderTimeoutJob**: 订单超时检查任务
-- **cacheCleanupJob**: 缓存清理任务
-- **reportJob**: 报表生成任务
+## 数据库与中间件依赖
 
-## MongoDB Schema
+### 必要依赖
+- MySQL（供 xxl-job-admin 使用 `xxl_job` 库）
+- MongoDB（供 scheduler-service 自己的任务日志使用）
+- xxl-job-admin
 
-### task_logs
-```json
-{
-  "_id": "xxx",
-  "jobId": "20240601123456789",
-  "executorId": "scheduler-service",
-  "jobName": "testJob",
-  "jobParam": "{}",
-  "status": 0,
-  "handleResult": "{\"currentTime\":\"2024-06-01 14:30:00\"}",
-  "executeTime": 1234,
-  "handleMsg": null,
-  "createTime": "2024-06-01T14:30:00",
-  "updateTime": "2024-06-01T14:30:00",
-  "deleted": 0
-}
-```
+### 脚本
+- `scripts/mysql/xxl-job.sql`
 
-## 使用示例
+当前脚本已经整理为：
+- 可重复执行
+- 补齐 `xxl_job_log_report`
+- 补齐 `xxl_job_lock`
+- 对齐当前 admin 常见字段结构
 
-### 查询任务日志
+---
+
+## 启动前准备
+
+### 1. 初始化 xxl-job 数据库
+
 ```bash
-curl -X GET "http://localhost:8087/api/task-log/list?jobName=testJob&page=1&size=10"
+docker exec -i learning-mysql mysql -uroot -proot < scripts/mysql/xxl-job.sql
 ```
 
-### 查询成功日志
-```bash
-curl -X GET http://localhost:8087/api/task-log/success
-```
+### 2. 启动 xxl-job-admin
 
-### 查询失败日志
-```bash
-curl -X GET http://localhost:8087/api/task-log/fail
-```
+如果你是按 WSL2 文档走本机容器方式，确认 `xxl-job-admin` 已启动。
 
-### 统计任务执行次数
-```bash
-curl -X GET http://localhost:8087/api/task-log/count/testJob
-```
+默认访问地址通常是：
 
-### 统计任务成功次数
-```bash
-curl -X GET http://localhost:8087/api/task-log/count/success/testJob
-```
-
-### 统计任务失败次数
-```bash
-curl -X GET http://localhost:8087/api/task-log/count/fail/testJob
-```
-
-### 获取任务统计信息
-```bash
-curl -X GET http://localhost:8087/api/task-log/statistics/testJob
-
-# 返回: {"totalCount": 100, "successCount": 98, "failCount": 2, "successRate": "98.00%"}
-```
-
-## 注意事项
-
-1. **xxl-job Server部署**: 需要单独部署xxl-job-admin和xxl-job-executor
-2. **任务幂等性**: 任务需要保证幂等性，避免重复执行
-3. **任务超时**: xxl-job支持任务超时设置，超过超时时间自动失败
-4. **任务阻塞**: xxl-job支持阻塞处理策略（单机串行、丢弃后续调度、覆盖之前调度）
-5. **日志保留**: xxl-job executor日志保留天数配置
-6. **路由策略**: 支持多种路由策略（轮询、随机、故障转移、一致性哈希、分片广播、LRU等）
-
-## 扩展功能
-
-- [ ] 任务告警
-- [ ] 任务依赖
-- [ ] 任务分组
-- [ ] 任务优先级
-- [ ] 任务依赖检查
-- [ ] 任务历史趋势分析
-- [ ] 任务性能监控
-- [ ] 任务重试机制
-
-## 相关技术文档
-
-- [xxl-job官方文档](https://www.xuxueli.com/xxl-job/)
-- [MongoDB官方文档](https://www.mongodb.com/docs/)
-- [Spring Data MongoDB](https://docs.spring.io/spring-data/mongodb/)
-
-## xxl-job部署
-
-### Docker部署（推荐）
-```bash
-# 启动MySQL（xxl-job需要MySQL）
-docker run -d --name mysql-xxl-job \
-  -p 3306:3306 \
-  -e MYSQL_ROOT_PASSWORD=root \
-  -e MYSQL_DATABASE=xxl_job \
-  -e MYSQL_USER=xxl-job \
-  -e MYSQL_PASSWORD=123456 \
-  mysql:8.0
-
-# 启动xxl-job-admin
-docker run -d --name xxl-job-admin \
-  -p 8080:8080 \
-  -e PARAMS="--spring.datasource.url=jdbc:mysql://mysql-xxl-job:3306/xxl_job?Unicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai \
-  --spring.datasource.username=xxl-job \
-  --spring.datasource.password=123456" \
-  xuxueli/xxl-job-admin:2.4.0
-
-# 启动Scheduler Service作为执行器
-cd scheduler-service
-mvn spring-boot:run
-```
-
-### 本地部署
-```bash
-# 1. 下载xxl-job
-wget https://github.com/xuxueli/xxl-job/releases/download/2.4.0/xxl-job-2.4.0.tar.gz
-
-# 2. 解压并启动
-tar -xzf xxl-job-2.4.0.tar.gz
-cd xxl-job-2.4.0
-
-# 3. 启动xxl-job-admin
-cd admin
-mvn clean package -DskipTests
-java -jar xxl-job-admin/target/xxl-job-admin-2.4.0.jar
-
-# 4. 访问管理控制台
+```text
 http://localhost:8080/xxl-job-admin
-
-# 5. 创建执行器（appname=scheduler-service）
 ```
 
-## 与其他服务的交互
+默认管理员账号：
+- 用户名：`admin`
+- 密码：`123456`
 
-### xxl-job Admin
-- **注册执行器**: Scheduler Service自动注册为执行器
-- **任务调度**: xxl-job Admin调度任务，发送到Scheduler Service
-- **任务管理**: 在管理控制台配置任务
+### 3. 启动 MongoDB
 
-### MongoDB
-- **数据存储**: 任务执行日志存储在MongoDB
-- **查询**: 通过MongoDB查询任务执行历史
+因为 scheduler-service 里自带 MongoDB 日志功能。
 
-### 任务处理器
-- **TestTaskHandler**: 测试任务
-- **MailNotificationTaskHandler**: 邮件通知任务
-- **statisticsJob**: 数据统计任务
-- **orderTimeoutJob**: 订单超时检查任务
-- **cacheCleanupJob**: 缓存清理任务
-- **reportJob**: 报表生成任务
+---
 
-## 路由策略说明
+## 启动 Scheduler Service
 
-### 轮询（ROUND）
-依次轮询执行器集群中的机器执行任务，每个机器执行一次。
-
-### 随机（RANDOM）
-随机选择执行器集群中的一台机器执行任务。
-
-### 故障转移（FAILOVER）
-当第一个执行器执行失败后，尝试让下一个执行器执行。
-
-### 一致性哈希（CONSISTENT_HASH）
-使用一致性哈希算法选择执行器，保证相同任务在相同执行器上执行。
-
-### 分片广播（SHARDING_BROADCAST)
-将任务分片，多个执行器并行执行任务的不同分片。
-
-### LRU
-最近最少使用算法，淘汰长时间未执行的任务。
-
-### FRIST
-总是选择第一台可用的执行器。
-
-## 阻塞处理策略
-
-### 单机串行（SERIAL_EXECUTION）
-同一个任务实例只能同时执行一个。
-
-### 丢弃后续调度（DISCARD_LATER）
-如果任务正在执行，丢弃后续的调度请求。
-
-### 覆盖之前调度（COVER_EARLY）
-如果任务正在执行，停止当前任务，立即执行新任务。
-
-## Cron表达式示例
-
-```cron
-# 每天凌晨2点执行
-0 0 2 * * ?
-
-# 每小时执行
-0 0 * * * ?
-
-# 每周一上午9点执行
-0 0 9 ? * MON
-
-# 每月1号凌晨1点执行
-0 0 1 1 * ?
-
-# 每5分钟执行
-0 */5 * * * ?
-
-# 每天早上8点到晚上8点之间，每小时执行一次
-0 0-20/1 * * * ?
+```bash
+mvn -pl scheduler-service spring-boot:run
 ```
+
+---
+
+## 如何在 xxl-job-admin 里配置执行器
+
+登录 admin 后：
+
+### 1）新增执行器
+建议配置：
+- AppName：`scheduler-service`
+- 名称：`Scheduler Service Executor`
+- 注册方式：自动注册
+
+这里最关键的是：
+- **AppName 必须和 `application.yml` 里的 `xxl.job.executor.appname` 一致**
+
+也就是：
+
+```yaml
+appname: scheduler-service
+```
+
+### 2）新增任务
+你可以新增任务时把 `JobHandler` 填成下面这些值之一：
+
+- `testJob`
+- `statisticsJob`
+- `orderTimeoutJob`
+- `cacheCleanupJob`
+- `reportJob`
+- `sendDailyReportJob`
+
+---
+
+## 推荐你先验证哪个任务
+
+最推荐先验证：
+
+### 1. `testJob`
+因为它最简单，最适合先确认：
+- admin 和 executor 是否联通
+- handler 名称是否正确
+- 执行日志是否能正常返回
+
+### 2. `statisticsJob`
+第二个可以测这个，用于确认：
+- 复杂返回内容是否正常
+- 执行成功日志是否正常
+
+---
+
+## 最小联调步骤
+
+建议按这个顺序：
+
+1. 起 MySQL
+2. 执行 `scripts/mysql/xxl-job.sql`
+3. 起 xxl-job-admin
+4. 起 MongoDB
+5. 起 `scheduler-service`
+6. 登录 admin
+7. 新增执行器：`scheduler-service`
+8. 新建任务，Handler 填 `testJob`
+9. 手动触发一次
+
+### 预期
+- 页面上任务触发成功
+- scheduler-service 日志里能看到执行日志
+- admin 里能看到执行结果
+
+---
+
+## 常见问题
+
+### 1. `Table 'xxl_job.xxl_job_log_report' doesn't exist`
+说明旧版 `scripts/mysql/xxl-job.sql` 缺失表。
+
+当前仓库已修复，直接：
+- 删除旧 `xxl_job` 库
+- 重跑最新版脚本
+
+### 2. `Unknown column 't.address_list' in 'field list'`
+说明 admin 镜像版本和表结构版本不一致。
+
+当前仓库已经把 `xxl_job_group` 调整到更接近当前 admin 结构。
+如果你之前初始化过旧表结构，建议：
+- 删除旧 `xxl_job` 库
+- 重新执行 `scripts/mysql/xxl-job.sql`
+
+### 3. admin 看不到执行器
+重点检查：
+- admin 是否启动
+- `appname` 是否一致
+- `executor.port` 是否被占用
+- WSL2 / Docker 端口是否可达
+
+### 4. 任务触发了但无日志
+重点检查：
+- `JobHandler` 是否和 `@XxlJob("...")` 名称一致
+- `scheduler-service` 是否真正启动成功
+- `logpath` 是否可写
+
+---
+
+## 关键文件
+
+- `scheduler-service/pom.xml`
+- `scheduler-service/src/main/java/com/learning/scheduler/config/XxlJobConfig.java`
+- `scheduler-service/src/main/java/com/learning/scheduler/handler/TestTaskHandler.java`
+- `scheduler-service/src/main/java/com/learning/scheduler/handler/MailNotificationTaskHandler.java`
+- `scheduler-service/src/main/resources/application.yml`
+- `scripts/mysql/xxl-job.sql`
+- `docs/WSL2-Ubuntu24-Deployment-CN.md`
