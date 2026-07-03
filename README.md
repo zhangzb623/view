@@ -511,6 +511,7 @@ Detailed request examples are maintained in each service README:
 - [Future Features Index](docs/future-features/README.md)
 - [Progress Summary](docs/Progress-Summary.md)
 - [Next Steps After Compile Success](docs/Next-Steps-After-Compile-Success.md)
+- [Continue On Another PC Guide](docs/Continue-On-Another-PC-Guide.md)
 - [User Service README](user-service/README.md)
 - [Product Service README](product-service/README.md)
 - [Order Service README](order-service/README.md)

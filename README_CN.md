@@ -385,6 +385,7 @@ python chat-server/scripts/chat_test_client.py
 - [未来功能索引](docs/future-features/README.md)
 - [阶段进展总结](docs/Progress-Summary.md)
 - [编译成功后的下一步](docs/Next-Steps-After-Compile-Success.md)
+- [换电脑继续开发指南](docs/Continue-On-Another-PC-Guide.md)
 - [用户服务 README](user-service/README.md)
 - [商品服务 README](product-service/README.md)
 - [订单服务 README](order-service/README.md)
