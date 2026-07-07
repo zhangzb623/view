@@ -176,7 +176,9 @@ cd /mnt/d/coding_file/view
 mkdir -p ~/projects
 cd ~/projects
 git clone <你的仓库地址> spring-cloud-learning-system
+git clone https://github.com/zhangzb623/view.git view
 cd spring-cloud-learning-system
+cd view
 ```
 
 原因：
