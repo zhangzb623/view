@@ -2,6 +2,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: learning-mysql
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       TZ: Asia/Shanghai
@@ -16,6 +17,7 @@ services:
   redis:
     image: redis:7.2
     container_name: learning-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     command: redis-server --requirepass root
